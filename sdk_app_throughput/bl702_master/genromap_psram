@@ -1,0 +1,3 @@
+#!/bin/sh
+make CONFIG_USE_PSRAM=1 -j
+exit $?

@@ -42,6 +42,12 @@ CONFIG_USE_XTAL32K := 1
 endif
 endif
 
+ifeq ($(CONFIG_ZIGBEE), 1)
+ifneq ($(CONFIG_ZB_NCP_ENABLE), 1)
+CONFIG_ZIGBEE_CLI := 1
+endif
+endif
+
 # if CONFIG_PDS_CPU_PWROFF is defined, CONFIG_LINK_CUSTOMER must be defined to avoid linking the default .ld file
 ifeq ($(CONFIG_PDS_CPU_PWROFF),1)
 CONFIG_LINK_CUSTOMER := 1
