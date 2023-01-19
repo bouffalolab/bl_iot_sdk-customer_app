@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022 Bouffalolab.
+ * Copyright (c) 2016-2023 Bouffalolab.
  *
  * This file is part of
  *     *** Bouffalolab Software Dev Kit ***
@@ -1187,9 +1187,32 @@ static void event_cb_key_event(input_event_t *event, void *private_data)
 extern void ble_uart_init(uint8_t uartid);
 #endif
 
+static int get_dts_addr(const char *name, uint32_t *start, uint32_t *off)
+{
+    uint32_t addr = hal_board_get_factory_addr();
+    const void *fdt = (const void *)addr;
+    uint32_t offset;
+
+    if (!name || !start || !off) {
+        return -1;
+    }
+
+    offset = fdt_subnode_offset(fdt, 0, name);
+    if (offset <= 0) {
+       log_error("%s NULL.\r\n", name);
+       return -1;
+    }
+
+    *start = (uint32_t)fdt;
+    *off = offset;
+
+    return 0;
+}
+
 static void proc_main_entry(void *pvParameters)
 {
-#if 0
+#if 1
+    uint32_t fdt = 0, offset = 0;
     if (0 == get_dts_addr("gpio", &fdt, &offset)) {
         hal_gpio_init_from_dts(fdt, offset);
         fdt_button_module_init((const void *)fdt, (int)offset);

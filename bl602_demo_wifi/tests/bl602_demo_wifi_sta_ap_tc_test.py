@@ -25,7 +25,7 @@ def bl602_demo_wifi_sta_ap_tc(env, extra_data):
         print('BL602 CLI init done')
         time.sleep(1)
 
-        for i in range(2):
+        for i in range(3):
             print('To reboot BL602')
             dut.write('reboot')
             dut.expect("Booting BL602 Chip...", timeout=0.5)
@@ -72,10 +72,10 @@ def bl602_demo_wifi_sta_ap_tc(env, extra_data):
             cmd_wifi_connect = ' '.join(cmd)
             dut.write(cmd_wifi_connect)
             dut.expect("Entering wifiConnected_IPOK state", timeout=50)
-
-            time.sleep(30)
+            time.sleep(20)
             dut.write('wifi_state')
             dut.expect("wifi state with ap connected ip got", timeout=1)
+            time.sleep(2)
         dut.halt()
     except DUT.ExpectTimeout:
         dut.write('p 0')
