@@ -57,6 +57,6 @@ CONFIG_BT_MESH_LOW_POWER := 1
 CONFIG_BT_MESH_PROXY := 1
 CONFIG_BT_MESH_GATT_PROXY := 1
 endif
-CONFIG_USE_DTS_SPI_CONFIG := 0
+CONFIG_USE_DTS_SPI_CONFIG := 1
 #blog enable components format :=blog_testc cli vfs helper
 # LOG_ENABLED_COMPONENTS:=blog_testc hosal loopset looprt bloop netbus_mgmr throughput tpsync bl_os_adapter
