@@ -306,6 +306,20 @@ static void example_ble_mesh_lighting_server_cb(bfl_ble_mesh_lighting_server_cb_
 #endif /*CONFIG_BT_MESH*/
 
 #ifndef CONFIG_BT_TL
+#if defined(CONFIG_BLE_TP_SVC_COMPATIBILITY_TEST)
+int ble_start_adv(void)
+{    struct bt_le_adv_param adv_param = {        
+     //options:3, connectable undirected, adv one time        
+     .options = 3,       
+     .interval_min = BT_GAP_ADV_FAST_INT_MIN_3,        
+     .interval_max = BT_GAP_ADV_FAST_INT_MAX_3,    };    
+      char *adv_name = "ble_test";
+      struct bt_data adv_data[] = {        BT_DATA(BT_DATA_NAME_COMPLETE, adv_name, strlen(adv_name)),    };   
+      printf("start ble adv\r\n");
+      return bt_le_adv_start(&adv_param, adv_data, ARRAY_SIZE(adv_data), NULL, 0);
+}
+#endif
+
 void bt_enable_cb(int err)
 {
     if (!err) {
@@ -354,7 +368,9 @@ void bt_enable_cb(int err)
 #if defined(CONFIG_HOGP_SERVER)
         hog_init();
 #endif
-
+#if defined(CONFIG_BLE_TP_SVC_COMPATIBILITY_TEST)
+        ble_start_adv();
+#endif
     }
 }
 

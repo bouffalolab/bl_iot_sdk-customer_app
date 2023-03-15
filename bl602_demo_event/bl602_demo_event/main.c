@@ -1227,6 +1227,10 @@ static void proc_main_entry(void *pvParameters)
     //uart's pinmux has been configured in vfs_uart_init(load uart1's pin info from devicetree)
     ble_uart_init(1);
     ble_controller_init(configMAX_PRIORITIES - 1);
+    #else
+    #if defined(CONFIG_BLE_TP_SVC_COMPATIBILITY_TEST)
+    ble_stack_start();
+    #endif
     #endif
 
     #if defined(CONFIG_AUTO_PTS)
