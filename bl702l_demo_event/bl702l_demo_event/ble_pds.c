@@ -27,28 +27,14 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
-#include <cli.h>
+#if defined(CFG_BLE_PDS)
+#include "rom_hal_ext.h"
+#include "rom_freertos_ext.h"
+#include "btble_lib_api.h"
 
-void coex_dump_pta(void);
-void coex_dump_wifi(void);
-
-static void __attribute__((unused)) cmd_coex_dump(char *buf, int len, int argc, char **argv) 
+void ble_pds_init(void)
 {
-    coex_dump_pta();
-    coex_dump_wifi();
+    bl_pds_init();
+    btble_controller_sleep_init();
 }
-
-const static struct cli_command cmds_user[] STATIC_CLI_CMD_ATTRIBUTE = {
-        { "coex_dump", "coex dump", cmd_coex_dump},
-};                                                                                   
-
-int codex_debug_cli_init()
-{
-    // static command(s) do NOT need to call aos_cli_register_command(s) to register.
-    // However, calling aos_cli_register_command(s) here is OK but is of no effect as cmds_user are included in cmds list.
-    // XXX NOTE: Calling this *empty* function is necessary to make cmds_user in this file to be kept in the final link.
-    //aos_cli_register_commands(cmds_user, sizeof(cmds_user)/sizeof(cmds_user[0]));          
-    return 0;
-}
-
+#endif//(CFG_BLE_PDS)

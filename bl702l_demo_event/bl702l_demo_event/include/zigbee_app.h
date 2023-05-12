@@ -27,28 +27,51 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef  __ZB_NOTIFY__
+#define  __ZB_NOTIFY__
+
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <cli.h>
+#include "zb_common.h"
+#include "zcl_common.h"
 
-void coex_dump_pta(void);
-void coex_dump_wifi(void);
+#define CODE_USER_ZB_OTA_SERVER_SEARCH      1
+#define CODE_USER_ZB_OTA_QUERY_NEXT_IMGE    2
+#define ZB_APP_ZCL_REPORT_CNT_MAX 5
 
-static void __attribute__((unused)) cmd_coex_dump(char *buf, int len, int argc, char **argv) 
-{
-    coex_dump_pta();
-    coex_dump_wifi();
-}
+#if defined(CFG_ZIGBEE_HBN)
+struct _zclReportInfo{
+    uint16_t clustId;
+    struct _zclReportCfgRec record;
+    uint64_t nextReportBaseCnt;
+    uint64_t nextReportDeltaMs;
+};
+#endif
 
-const static struct cli_command cmds_user[] STATIC_CLI_CMD_ATTRIBUTE = {
-        { "coex_dump", "coex dump", cmd_coex_dump},
-};                                                                                   
+zbRet_t zb_eventHandler(uint8_t evtId, uint8_t * evtParam);
 
-int codex_debug_cli_init()
-{
-    // static command(s) do NOT need to call aos_cli_register_command(s) to register.
-    // However, calling aos_cli_register_command(s) here is OK but is of no effect as cmds_user are included in cmds list.
-    // XXX NOTE: Calling this *empty* function is necessary to make cmds_user in this file to be kept in the final link.
-    //aos_cli_register_commands(cmds_user, sizeof(cmds_user)/sizeof(cmds_user[0]));          
-    return 0;
-}
+zbRet_t zcl_onoffEventHandler(uint8_t ep, uint8_t evtId, uint8_t * evtParam);
+zbRet_t zcl_levelControlEventHandler(uint8_t ep, uint8_t evtId, uint8_t * evtParam);
+zbRet_t zcl_IdentifyEventHandler(uint8_t ep, uint8_t evtId, uint8_t * evtParam);
 
+
+void register_zb_cb(void);
+typedef void (*zb_appCb)(const uint8_t status, const uint8_t roleType);
+void zb_register_app_cb(zb_appCb cb);
+
+void zb_app_startup(void);
+bool zb_isDevActiveInNwk(void);
+void zb_searchOtaServer(void);
+void zcl_otaQueryNextImage(void);
+#if defined(CFG_ZIGBEE_HBN)
+bool zcl_checkIfTriggerAttrReport(bool bReport);
+#endif
+
+//placeholder for manufacture to do initialization
+void zb_manuf_init();
+//placeholder for manufacture to register required clusters
+void zb_manuf_registerCluster(uint8_t ep);
+//placeholder for manufacture to register required callbacks
+void zb_manuf_registerCallback();
+#endif // __ZB_NOTIFY__

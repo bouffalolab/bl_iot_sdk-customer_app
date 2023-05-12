@@ -1301,8 +1301,45 @@ static void adc_tsen_init()
 
 void rijndael_aes_test(void);
 
+struct blverinf
+{
+    uint8_t anti_rollback;
+    uint8_t x;
+    uint8_t y;
+    uint8_t z;
+    uint32_t name_off;
+    uint32_t build_time_off;
+    uint32_t commit_id_off;
+    uint32_t rsvd0;
+    uint32_t rsvd1;
+};
+int bl_flash_init(void);
+int bl_flash_read(uint32_t addr, uint8_t *dst, int len);
+int print_component_version()
+{
+    uint32_t buf[256] = {0};
+    bl_flash_init();
+    // "FW" base + "FW" header + offset
+    bl_flash_read(0x10000 + 0x1000 + 0xc00, (uint8_t *)buf, 0x400);
+
+    printf("*************** component version ***************** \r\n");
+    if(buf[0] != 0x42464c42 || buf[1] != 0x46524556)
+        return -1;
+
+    for(struct blverinf *start=(struct blverinf *)&buf[2]; (uint32_t)start < (uint32_t)buf + 1024; start++) {
+        if(*(uint32_t *)start == 0x42464c42 && *((uint32_t *)start + 1) == 0x46524556)
+            break;
+        printf("component: %s, version: %s \r\n",                               \
+               (char *)((uint32_t)buf + start->name_off),                       \
+               (char *)((uint32_t)buf + start->commit_id_off));
+    }
+    printf("*************** component version ***************** \r\n");
+    return 0;
+}
 void main()
 {
+    print_component_version();
+
     bl_sys_init();
 
     system_thread_init();
@@ -1322,4 +1359,12 @@ void main()
 #if defined(CONFIG_AUTO_PTS)
     tester_init();
 #endif
+}
+int no_printf(const char *format, ...)
+{
+    return 1;
+}
+int no_puts(const char *s)
+{
+    return 1;
 }

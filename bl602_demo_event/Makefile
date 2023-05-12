@@ -71,6 +71,10 @@ endif
 endif
 include $(BL60X_SDK_PATH)/make_scripts_riscv/project.mk
 
+PRINTF_DISABLE_COMPONENTS:=
+export PRINTF_DISABLE_COMPONENTS
+VERSION_ENABLED_COMPONENTS:= wifi coredump
+export VERSION_ENABLED_COMPONENTS
 ifeq ($(CONFIG_BLECONTROLLER_LIB),all)
 LDFLAGS := $(filter-out $(addprefix -l$(BLECONTROLLER_LIB_PREFIX), $(filter-out $(BLECONTROLLER_LIB_DEFAULT), $(BLECONTROLLER_LIBS))), $(LDFLAGS))
 endif

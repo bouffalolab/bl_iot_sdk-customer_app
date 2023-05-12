@@ -27,28 +27,35 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
-#include <cli.h>
+#ifndef  __MAIN_H
+#define  __MAIN_H
 
-void coex_dump_pta(void);
-void coex_dump_wifi(void);
+#include <openthread/thread.h>
+#include <openthread/cli.h>
+#if OPENTHREAD_CONFIG_CHILD_SUPERVISION_ENABLE
+#include <child_supervision.h>
+#endif
+#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
+#include <config/mac.h>
+#endif
 
-static void __attribute__((unused)) cmd_coex_dump(char *buf, int len, int argc, char **argv) 
-{
-    coex_dump_pta();
-    coex_dump_wifi();
-}
+#define THREAD_CHANNEL          23
+#define THREAD_PANID            0xB702
+#define THREAD_UDP_PORT         0xB702
+#ifdef CFG_PDS_ENABLE
+#define THREAD_CSL_CHANNEL      23
+#define THREAD_CSL_PERIOD       (1000000 / 160)
+#ifdef CFG_CSL_RX
+#define THREAD_POLL_PERIOD      30000
+#else
+#define THREAD_POLL_PERIOD      1000
+#endif
+#endif
+void uart_init(uint8_t tx_pin, uint8_t rx_pin, uint32_t baudrate);
+int printf_ram(const char *format, ...);
 
-const static struct cli_command cmds_user[] STATIC_CLI_CMD_ATTRIBUTE = {
-        { "coex_dump", "coex dump", cmd_coex_dump},
-};                                                                                   
+uint32_t app_pds_callback(otPds_op_t pdsOp, uint32_t sleepTimeMs, int isWakeupFromRtc);
 
-int codex_debug_cli_init()
-{
-    // static command(s) do NOT need to call aos_cli_register_command(s) to register.
-    // However, calling aos_cli_register_command(s) here is OK but is of no effect as cmds_user are included in cmds list.
-    // XXX NOTE: Calling this *empty* function is necessary to make cmds_user in this file to be kept in the final link.
-    //aos_cli_register_commands(cmds_user, sizeof(cmds_user)/sizeof(cmds_user[0]));          
-    return 0;
-}
+void app_task(void);
 
+#endif // __DEMO_GPIO_H

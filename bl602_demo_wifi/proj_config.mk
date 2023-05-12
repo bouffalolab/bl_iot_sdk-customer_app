@@ -67,3 +67,6 @@ CONFIG_MBEDTLS_SHA256_USE_HW:=1
 
 #blog enable components format :=blog_testc cli vfs helper
 LOG_ENABLED_COMPONENTS:=blog_testc hosal loopset looprt bloop
+
+CONFIG_ENABLE_OS_TLS:=1
+CONFIG_LWIP_NETCONN_DUPLEX:=1
