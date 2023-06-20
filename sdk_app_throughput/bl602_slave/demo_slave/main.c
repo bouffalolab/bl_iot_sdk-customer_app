@@ -74,6 +74,8 @@
 #define CLI_CMD_AUTOSTART2              "cmd_auto2"
 
 
+extern void demo_hbn_set_magic(void);
+extern bool demo_hbn_is_wakup_from_hbn(void);
 extern void ble_stack_start(void);
 /* TODO: const */
 volatile uint32_t uxTopUsedPriority __attribute__((used)) =  configMAX_PRIORITIES - 1;
@@ -301,6 +303,8 @@ static void _cli_init()
 
     int ramsync_test_cli_init(void);
     ramsync_test_cli_init();
+    int bl602_hbn_cli_init(void);
+    bl602_hbn_cli_init();
 }
 
 static void cmd_stack_wifi(char *buf, int len, int argc, char **argv)
@@ -340,11 +344,28 @@ static void system_thread_init()
     /*nothing here*/
 }
 
+
+void app_handle_hbn(void *ptr, uint32_t length) 
+{
+    printf("bl602 enther hbn mode with wakup gpio 7 & 8\r\n");
+
+    demo_hbn_set_magic();
+
+    extern void demo_hbn_gpio(void);
+    demo_hbn_gpio();
+}
+
 void main()
 {
     bl_sys_init();
 
     system_thread_init();
+
+#ifdef CONF_ENABLE_HBN
+    if (!demo_hbn_is_wakup_from_hbn()) {
+        app_handle_hbn(NULL, 0);
+    }
+#endif
 
     puts("[OS] Starting proc_mian_entry task...\r\n");
     xTaskCreate(proc_main_entry, (char*)"main_entry", 1024, NULL, 15, NULL);

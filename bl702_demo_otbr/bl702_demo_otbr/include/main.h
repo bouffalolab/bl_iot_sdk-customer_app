@@ -27,74 +27,41 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#if defined(CONFIG_ZIGBEE_PROV) 
-#include "blsync_ble_app.h"
-#include <FreeRTOS.h>
-#include <task.h>
-#include "blsync_ble.h"
-#include "bluetooth.h"
-#include "ble_cli_cmds.h"
-#include "hci_driver.h"
-#include "ble_lib_api.h"
+#ifndef  __MAIN_H
+#define  __MAIN_H
 
-static bl_ble_sync_t *gp_index = NULL;
+#include <openthread/thread.h>
+#include <openthread/thread_ftd.h>
+#include <openthread/cli.h>
+#include <openthread_port.h>
+#include <include/openthread_br.h>
 
-static void zb_setlinkkey(uint8_t*linkkey){
+#define THREAD_CHANNEL      11
+#define THREAD_PANID        0x1234
+#define THREAD_EXTPANID     {0x11, 0x11, 0x11, 0x11, 0x22, 0x22, 0x22, 0x22}
+#define THREAD_NETWORK_KEY  {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
 
-    printf("zb link key =");
-    for(int i=0;i<16;i++){
+#define CODE_CLI_START_THREAD  0x04
 
-        printf("0x%x ",linkkey[i]);
-    }
-    printf("\n");
+// #define WIFI_LWIP_RESET_PIN 11
 
-}
-static void zb_reset(void){
+void app_cli_cdc_monitor(void);
+void app_cli_task(void);
 
-     printf("%s\n",__func__);
-     void zb_reset(void);
-}
+void app_taskStart(void);
 
-static struct blesync_zb_func zb_func = {
-    .zb_get_installcode = NULL,
-    .zb_join_network = NULL,
-    .zb_setlinkkey = zb_setlinkkey,
-    .zb_setpanid = NULL,
-    .zb_reset = zb_reset,
-};
+void wifi_lwip_hw_reset(void);
+void wifi_lwip_init(void);
+void cmd_connect(char *buf, int len, int argc, char **argv);
+void cmd_disconnect(char *buf, int len, int argc, char **argv);
+void cmd_scan(char *buf, int len, int argc, char **argv);
+void cmd_get_info(char *buf, int len, int argc, char **argv);
 
-static void blesync_complete_cb (void *p_arg)
-{
-    bl_ble_sync_t *p_index = (bl_ble_sync_t *)p_arg;
-    bl_blezb_sync_stop(p_index);
-    vPortFree(p_index);
-}
+void blsync_ble_start (void);
+void blsync_ble_stop (void);
 
-void blsync_ble_start (void)
-{
-    if (gp_index != NULL) {
-        printf("blsync already started\r\n");
-        return;
-    }
-#ifdef CONFIG_BT_STACK_CLI 
-    ble_cli_register();
-#endif /* CONFIG_BT_STACK_CLI */
-    gp_index = pvPortMalloc(sizeof(bl_ble_sync_t));
-    if (gp_index == NULL) {
-        return;
-    }
+void eth_lwip_init(void);
 
-    bl_blezb_sync_start(gp_index,
-                      &zb_func,
-                      blesync_complete_cb,
-                      (void *)gp_index);
-}
+void main_task_resume(void);
 
-void blsync_ble_stop (void)
-{
-    bl_blezb_sync_stop(gp_index);
-    vPortFree(gp_index);
-    gp_index = NULL;
-}
-
-#endif
+#endif // __DEMO_GPIO_H

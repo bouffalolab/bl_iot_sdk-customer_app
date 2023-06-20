@@ -39,11 +39,11 @@
 #include <config/mac.h>
 #endif
 
-#define THREAD_CHANNEL          23
+#define THREAD_CHANNEL          11
 #define THREAD_PANID            0xB702
 #define THREAD_UDP_PORT         0xB702
 #ifdef CFG_PDS_ENABLE
-#define THREAD_CSL_CHANNEL      23
+#define THREAD_CSL_CHANNEL      20
 #define THREAD_CSL_PERIOD       (1000000 / 160)
 #ifdef CFG_CSL_RX
 #define THREAD_POLL_PERIOD      30000
@@ -51,6 +51,10 @@
 #define THREAD_POLL_PERIOD      1000
 #endif
 #endif
+
+#define THREAD_EXTPANID     	{0x11, 0x11, 0x11, 0x11, 0x22, 0x22, 0x22, 0x22}
+#define THREAD_NETWORK_KEY  	{0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
+
 void uart_init(uint8_t tx_pin, uint8_t rx_pin, uint32_t baudrate);
 int printf_ram(const char *format, ...);
 

@@ -46,43 +46,6 @@ void _cli_init(int fd_console)
 
 #endif
 
-ATTR_PDS_SECTION
-void interrupt_entry_app(uint32_t mcause)
-{
-    void *handler = NULL;
-
-    mcause &= 0x7FFFFFF;
-    handler = bl_irq_handler_list[mcause];
-
-    if (handler) {
-        ((void (*)(void))handler)();
-    } else {
-        ATTR_PDS_SECTION static const char dbg_str[] = "mcause = %ld\r\n";
-
-        uart_init(14, 15, 2000000);
-
-        printf_ram(dbg_str, mcause);
-        while (1) {
-            /*dead loop now*/
-        }
-    }
-}
-
-
-ATTR_PDS_SECTION
-void  exception_entry_app(uint32_t mcause, uint32_t mepc, uint32_t mtval, uintptr_t *regs, uintptr_t *tasksp)
-{
-    ATTR_PDS_SECTION static const char dbg_str[] = "Exception Entry--->>>\r\n mcause %08lx, mepc %08lx, mtval %08lx\r\n" ;
-
-    uart_init(14, 15, 2000000);
-
-    printf_ram(dbg_str, mcause, mepc, mtval);
-
-    while (1) {
-        /*dead loop now*/
-    }
-}
-
 #ifdef CFG_PDS_ENABLE
 
 static void ot_stateChangeCallback(uint32_t flags, void * p_context) 
@@ -126,7 +89,7 @@ void otrInitUser(otInstance * instance)
 
     printf("Thread version     : %s\r\n", otGetVersionString());
 
-    uint8_t testNetworkkey[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    uint8_t testNetworkkey[] = THREAD_NETWORK_KEY;
     otThreadSetNetworkKey(instance, (const otNetworkKey *)testNetworkkey);
     otLinkSetChannel(instance, THREAD_CHANNEL);
 
@@ -185,13 +148,6 @@ void otrAppProcess(ot_system_event_t sevent)
 int main(int argc, char *argv[])
 {
     otRadio_opt_t opt;
-
-    /** comment out for debug purpose */
-   // uint32_t tag = otrEnterCrit();
-
-   // interrupt_entry_ptr = interrupt_entry_app;
-   // exception_entry_ptr = exception_entry_app;
-   // otrExitCrit(tag);
 
 #ifdef CFG_PDS_ENABLE
     bl_pds_init();
