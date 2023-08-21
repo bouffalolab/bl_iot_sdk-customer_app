@@ -50,8 +50,7 @@ endif
 
 ifeq ($(CONFIG_USE_WIFI_BR), 1)
 INCLUDE_COMPONENTS += virt_net tpsync
-endif
-ifeq ($(CONFIG_ETHERNET),1)
+else
 INCLUDE_COMPONENTS += bl702_ethernet lwip_dhcpd blota
 endif
 ifeq ($(CONFIG_GEN_ROM),1)
@@ -86,17 +85,14 @@ CPPFLAGS += -DDHCP_DEBUG=LWIP_DBG_ON
 CPPFLAGS += -DETHARP_DEBUG=LWIP_DBG_ON
 endif
 
-CPPFLAGS += -DPBUF_POOL_SIZE=20
+CPPFLAGS += -DPBUF_POOL_SIZE=0
 CPPFLAGS += -DPBUF_POOL_BUFSIZE=1600
 CPPFLAGS += -DCFG_TCPIP_STACKSIZE=1536
 
 CPPFLAGS += -DOTRADIO_RX_FRAME_BUFFER_NUM=12
 CPPFLAGS += -DINCLUDE_xTaskGetHandle=1
 
-#CPPFLAGS += -DOTBR_VENDOR_NAME="BouffaloLab"
-# CPPFLAGS += -DOTBR_VENDOR_NAME=\"OpenThread\"
-# CPPFLAGS += -DOTBR_PRODUCT_NAME=\"Border\" \"Router\"
-# CPPFLAGS += -DOTBR_MESHCOP_SERVICE_INSTANCE_NAME=\"OpenThread\" \"Border\" \"Router\"
+#CPPFLAGS += -DOPENTHREAD_CONFIG_LOG_LEVEL=OT_LOG_LEVEL_DEBG
 
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_br/otbr_config.mk
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
