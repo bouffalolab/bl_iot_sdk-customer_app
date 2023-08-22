@@ -345,14 +345,4 @@ void otrInitUser(otInstance * instance)
 #endif
 }
 
-#else
-
-void otrInitUser(otInstance * instance)
-{
-#ifdef CONFIG_NCP
-    otAppNcpInit((otInstance * )instance);
-#else
-    otAppCliInit((otInstance * )instance);
-#endif
-}
 #endif
