@@ -222,7 +222,10 @@ const static struct cli_command cmds_user[] STATIC_CLI_CMD_ATTRIBUTE = {
     {"ipaddr", "ipaddr operation", cmd_ipaddr},
 };
 
-
+void otrInitUser(otInstance * instance)
+{
+    otAppCliInit((otInstance * )instance);
+}
 
 void otrAppProcess(ot_system_event_t sevent) 
 {
@@ -261,15 +264,6 @@ void otr_start_default(void)
 }
 #endif
 
-void otrInitUser(otInstance * instance)
-{
-    otAppCliInit((otInstance * )instance);
-
-#ifdef CFG_THREAD_AUTO_START
-    otr_start_default();
-#endif
-}
-
 void main_task_resume(void) 
 {
     TaskHandle_t taskHandle = xTaskGetHandle( "main" );
@@ -283,9 +277,6 @@ void main_task_resume(void)
     else {
         printf("Backbone link connectivity is ready. Failed to resume main task.\r\n");
     }
-
-
-    otbr_netif_init();
 }
 
 int main(int argc, char *argv[])
@@ -323,6 +314,14 @@ int main(int argc, char *argv[])
 #endif /*CFG_ETHERNET_ENABLE*/
 
     otrStart(opt);
+
+    vTaskSuspend(NULL);
+
+    otbr_netif_init(otrGetInstance());
+
+#ifdef CFG_THREAD_AUTO_START
+    otr_start_default();
+#endif
 
     return 0;
 }

@@ -74,6 +74,7 @@ INCLUDE_COMPONENTS += openthread_port openthread_utils_bl702 openthread
 INCLUDE_COMPONENTS += $(PROJECT_NAME)
 
 CPPFLAGS += -DCFG_CPP_ENABLE=1
+CPPFLAGS += -DNO_RX_CHANNEL_AFTER_TX_DONE
 
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
 
