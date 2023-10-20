@@ -9,7 +9,7 @@ PROJECT_BOARD := evb
 export PROJECT_PATH PROJECT_BOARD
 #CONFIG_TOOLPREFIX :=
 
-BLECONTROLLER_LIBS := m1s1 m0s1 m0s1s
+BLECONTROLLER_LIBS := m1s1 m0s1 m0s1s m8s1
 BLECONTROLLER_LIB_DEFAULT := m1s1
 BLECONTROLLER_LIB_PREFIX := blecontroller_602_
 
@@ -22,7 +22,7 @@ $(info ****** Please SET BL60X_SDK_PATH ******)
 $(info ****** Trying SDK PATH [$(BL60X_SDK_PATH)])
 endif
 
-COMPONENTS_NETWORK := sntp dns_server matter_factory_data
+COMPONENTS_NETWORK := sntp dns_server
 COMPONENTS_BLSYS   := bltime blfdt blmtd blota bloop loopadc looprt loopset
 COMPONENTS_VFS     := romfs cjson
 

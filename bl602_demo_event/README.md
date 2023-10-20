@@ -12,6 +12,7 @@ genblehogp:       build Wi-Fi and BLE. BLE as slave, and enable HOGP service.
 genblem1s1:       build Wi-Fi and BLE. 1 BLE connection is supported, BL602 can be master or slave in this connection.
 genblem0s1:       build Wi-Fi and BLE. 1 BLE connection is supported, BL602 can only be slave in this connection.
 genblem0s1s:      build Wi-Fi and BLE. based on genblem0s1, add BLE scan feature.
+genblem8s1:       build Wi-Fi and BLE. 8 BLE connections are supported, BL602 can be master or slave in this connection.
 genblemesh:       build Wi-Fi and BLE mesh. mesh application without mesh model code.
 genblemeshmodel:  build Wi-Fi and BLE mesh. mesh application with mesh model code.
 genromap:         build Wi-Fi and BLE. BLE support all roles, 2 BLE connection is supported, and enable tp service.

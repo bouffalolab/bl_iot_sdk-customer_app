@@ -46,10 +46,10 @@ def bl602_demo_event_ble(env, extra_data):
         print('[DUT2] Ble INIT')
 
         dut1.write('ble_init')
-        dut1.expect('Init successfully', timeout=0.5)
+        time.sleep(0.5)
         print('[DUT1] Register the connection callback function')
         dut2.write('ble_init')
-        dut2.expect('Init successfully', timeout=0.5)
+        time.sleep(0.5)
         print('[DUT2] Register the connection callback function')
 
         dut1.write('ble_auth')

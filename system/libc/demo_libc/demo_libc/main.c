@@ -128,13 +128,15 @@ static void cmd_printf_test(char *pbuf, int len, int argc, char **argv)
     printf("#%i#\r\n", 18);
     printf("#%d#\r\n", 18);
     printf("#%u#\r\n", 18);
-    printf("#%lu#\r\n", 18);
-    printf("#%li#\r\n", 18);
+    printf("#%lu#\r\n", 18UL);
+    printf("#%li#\r\n", 18L);
+#if 0
     printf("#%-+#06d#\r\n", -123);
     printf("#%-+#6d#\r\n", -123);
     printf("#%+#06d#\r\n", -123);
     printf("#%06d#\r\n", -123);
     printf("#%+15s#\r\n", "ABCDEF");
+#endif
     /* from ncurses make_keys */
     printf("{ %4d, %-*.*s },\t/* %s */\r\n", 139, 16, 16, "KEY_A1", "key_a1");
     printf("{ %4d, %-*.*s },\t/* %s */\r\n", 139, 16, 2, "KEY_A1", "key_a1");
@@ -231,7 +233,7 @@ static void cmd_random(char *buf, int len, int argc, char **argv)
 
     result = random();
 
-    printf("\r\n**********random test rand[%08x]**************\r\n", result);
+    printf("\r\n**********random test rand[%08lx]**************\r\n", result);
 }
 
 const static struct cli_command cmds_user[] STATIC_CLI_CMD_ATTRIBUTE = {

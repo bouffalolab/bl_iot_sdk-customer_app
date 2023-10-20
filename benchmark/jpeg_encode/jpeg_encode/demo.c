@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <inttypes.h>
 #include <cli.h>
 #include <stdint.h>
 #include <utils_log.h>
@@ -50,7 +51,8 @@ static void jpec_test_cmd(char *buf, int len, int argc, char **argv)
             jpec_enc_t *e = jpec_enc_new(data, w, h);
             const uint8_t *jpeg = jpec_enc_run(e, &length);
 
-            printf("Encoder done (%d bytes), time: %d us\r\n", length, (bl_timer_now_us() - start_us));
+            (void)jpeg;
+            printf("Encoder done (%d bytes), time: %" PRIu32 " us\r\n", length, (bl_timer_now_us() - start_us));
             jpec_enc_del(e);
             free(data);
         }
