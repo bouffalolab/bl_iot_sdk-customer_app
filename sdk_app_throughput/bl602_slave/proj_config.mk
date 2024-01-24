@@ -60,3 +60,4 @@ endif
 CONFIG_USE_DTS_SPI_CONFIG := 1
 #blog enable components format :=blog_testc cli vfs helper
 # LOG_ENABLED_COMPONENTS:=blog_testc hosal loopset looprt bloop netbus_mgmr throughput tpsync bl_os_adapter
+# LOG_ENABLED_COMPONENTS:=netbus_mgmr tpsync bl_os_adapter
