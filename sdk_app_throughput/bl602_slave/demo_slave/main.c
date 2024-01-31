@@ -129,7 +129,8 @@ static void wifi_sta_connect(char *ssid, char *password)
     wifi_mgmr_sta_connect(wifi_interface, ssid, password, NULL, NULL, 0, 0);
 }
 
-static void send_ready_ind()
+static bool fSentReady = false;
+void send_ready_ind()
 {
     netbus_slave_ready_ind_msg_t msg;
 
@@ -162,7 +163,6 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
             printf("[APP] [EVT] MGMR DONE %lld, now %lums\r\n", aos_now_ms(), bl_timer_now_us()/1000);
 #ifdef CFG_NETBUS_WIFI_ENABLE
             netbus_wifi_mgmr_start(&g_netbus_wifi_mgmr_env);
-            send_ready_ind();
 #endif
         }
         break;
@@ -304,8 +304,14 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
 
 static void send_heartbeat(TimerHandle_t xTimer)
 {
-    netbus_slave_heartbeat_msg_t msg;
+    if (!fSentReady)
+    {
+        send_ready_ind();
+        fSentReady = true;
+    }
 
+    netbus_slave_heartbeat_msg_t msg;
+    
     msg.hdr.cmd = BFLB_CMD_SLAVE_HEARTBEAT;
     msg.hdr.msg_id = BFLB_CMD_SLAVE_HEARTBEAT;
     msg.args.reserved = 0xFF;
