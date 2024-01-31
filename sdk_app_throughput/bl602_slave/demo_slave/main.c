@@ -54,6 +54,7 @@
 
 #ifdef CFG_NETBUS_WIFI_ENABLE
 #include "netbus_mgmr.h"
+#include "netbus_transceiver.h"
 #endif
 
 #define mainHELLO_TASK_PRIORITY     ( 20 )
@@ -128,6 +129,19 @@ static void wifi_sta_connect(char *ssid, char *password)
     wifi_mgmr_sta_connect(wifi_interface, ssid, password, NULL, NULL, 0, 0);
 }
 
+static void send_ready_ind()
+{
+    netbus_slave_start_ind_msg_t msg;
+
+    msg.hdr.cmd = BFLB_CMD_SLAVE_READY_IND;
+    msg.hdr.msg_id = BFLB_CMD_SLAVE_READY_IND;
+    msg.args.reserved = 0xFF;
+
+    printf("send slave ready indication\r\n");
+
+    bflbmsg_send(&g_netbus_wifi_mgmr_env.trcver_ctx, BF1B_MSG_TYPE_CMD, &msg, sizeof(msg));
+}
+
 static void event_cb_wifi_event(input_event_t *event, void *private_data)
 {
 #ifdef CFG_NETBUS_WIFI_ENABLE
@@ -148,6 +162,7 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
             printf("[APP] [EVT] MGMR DONE %lld, now %lums\r\n", aos_now_ms(), bl_timer_now_us()/1000);
 #ifdef CFG_NETBUS_WIFI_ENABLE
             netbus_wifi_mgmr_start(&g_netbus_wifi_mgmr_env);
+            send_ready_ind();
 #endif
         }
         break;
@@ -287,6 +302,41 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
     }
 }
 
+static void send_heartbeat(TimerHandle_t xTimer)
+{
+    netbus_slave_heartbeat_msg_t msg;
+
+    msg.hdr.cmd = BFLB_CMD_SLAVE_HEARTBEAT;
+    msg.hdr.msg_id = BFLB_CMD_SLAVE_HEARTBEAT;
+    msg.args.reserved = 0xFF;
+
+    printf("send heartbeat\r\n");
+
+    bflbmsg_send(&g_netbus_wifi_mgmr_env.trcver_ctx, BF1B_MSG_TYPE_CMD, &msg, sizeof(msg));
+}
+
+TimerHandle_t heartbeatTimerHdl = NULL;
+#define SLAVE_HEARTBEAT_INTVL_IN_SEC 5
+static void app_startHeartbeat()
+{
+    printf("start heartbeat\r\n");
+    
+    if(heartbeatTimerHdl && xTimerIsTimerActive(heartbeatTimerHdl))
+    {
+        return;
+    }
+
+    heartbeatTimerHdl = xTimerCreate("Heartbeat", pdMS_TO_TICKS(SLAVE_HEARTBEAT_INTVL_IN_SEC * 1000), 1, NULL,  send_heartbeat);
+    if (heartbeatTimerHdl)
+    {
+        xTimerStart(heartbeatTimerHdl, 0);
+    }
+    else
+    {
+        printf("Failed to create heatbeat timer\r\n");
+    }
+}
+
 static void _cli_init()
 {
     /*Put CLI which needs to be init here*/
@@ -312,7 +362,6 @@ static void cmd_stack_wifi(char *buf, int len, int argc, char **argv)
     /*wifi fw stack and thread stuff*/
     static uint8_t stack_wifi_init  = 0;
 
-
     if (1 == stack_wifi_init) {
         puts("Wi-Fi Stack Started already!!!\r\n");
         return;
@@ -324,7 +373,6 @@ static void cmd_stack_wifi(char *buf, int len, int argc, char **argv)
     /*Trigger to start Wi-Fi*/
     printf("Start Wi-Fi fw is Done @%lums\r\n", bl_timer_now_us()/1000);
     aos_post_event(EV_WIFI, CODE_WIFI_ON_INIT_DONE, 0);
-
 }
 
 static void proc_main_entry(void *pvParameters)
@@ -335,6 +383,7 @@ static void proc_main_entry(void *pvParameters)
 
     aos_register_event_filter(EV_WIFI, event_cb_wifi_event, NULL);
     cmd_stack_wifi(NULL, 0, 0, NULL);
+    app_startHeartbeat();
 
     vTaskDelete(NULL);
 }
