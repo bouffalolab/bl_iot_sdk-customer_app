@@ -131,7 +131,7 @@ static void wifi_sta_connect(char *ssid, char *password)
 
 static void send_ready_ind()
 {
-    netbus_slave_start_ind_msg_t msg;
+    netbus_slave_ready_ind_msg_t msg;
 
     msg.hdr.cmd = BFLB_CMD_SLAVE_READY_IND;
     msg.hdr.msg_id = BFLB_CMD_SLAVE_READY_IND;
