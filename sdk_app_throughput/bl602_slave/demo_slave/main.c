@@ -33,6 +33,7 @@
 #include <bl_timer.h>
 #include <bl_gpio_cli.h>
 #include <bl_wdt_cli.h>
+#include <bl_wdt.h>
 #include <hosal_uart.h>
 #include <hosal_adc.h>
 #include <hal_sys.h>
@@ -302,6 +303,17 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
     }
 }
 
+void vApplicationIdleHook(void)
+{
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_feed();
+#endif
+    __asm volatile(
+            "   wfi     "
+    );
+    /*empty*/
+}
+
 static void send_heartbeat(TimerHandle_t xTimer)
 {
     if (!fSentReady)
@@ -396,7 +408,9 @@ static void proc_main_entry(void *pvParameters)
 
 static void system_thread_init()
 {
-    /*nothing here*/
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_init(4000);
+#endif
 }
 
 
