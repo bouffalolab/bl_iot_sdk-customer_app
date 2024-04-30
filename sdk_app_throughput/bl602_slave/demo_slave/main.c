@@ -316,6 +316,10 @@ void vApplicationIdleHook(void)
 
 static void send_heartbeat(TimerHandle_t xTimer)
 {
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_feed();
+#endif
+
     if (!fSentReady)
     {
         send_ready_ind();
@@ -409,10 +413,9 @@ static void proc_main_entry(void *pvParameters)
 static void system_thread_init()
 {
 #if defined(CFG_WATCHDOG_ENABLE)
-    bl_wdt_init(4000);
+    bl_wdt_init(6000);
 #endif
 }
-
 
 void app_handle_hbn(void *ptr, uint32_t length) 
 {
@@ -435,6 +438,8 @@ void main()
         app_handle_hbn(NULL, 0);
     }
 #endif
+
+    printf("Reset Info %d\r\n", bl_sys_rstinfo_get());
 
     puts("[OS] Starting proc_mian_entry task...\r\n");
     xTaskCreate(proc_main_entry, (char*)"main_entry", 1024, NULL, 15, NULL);
