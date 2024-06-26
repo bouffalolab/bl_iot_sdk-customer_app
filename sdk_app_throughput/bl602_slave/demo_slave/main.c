@@ -56,6 +56,7 @@
 #ifdef CFG_NETBUS_WIFI_ENABLE
 #include "netbus_mgmr.h"
 #include "netbus_transceiver.h"
+#include "netbus_wifi_mgmr_cmd_handlers.h"
 #endif
 
 #define mainHELLO_TASK_PRIORITY     ( 20 )
@@ -130,7 +131,8 @@ static void wifi_sta_connect(char *ssid, char *password)
     wifi_mgmr_sta_connect(wifi_interface, ssid, password, NULL, NULL, 0, 0);
 }
 
-static bool fSentReady = false;
+static volatile bool fSlaveReadyIndSent = false;
+
 void send_ready_ind()
 {
     netbus_slave_ready_ind_msg_t msg;
@@ -314,16 +316,28 @@ void vApplicationIdleHook(void)
     /*empty*/
 }
 
+void netbus_cmd_confirm_hook(netbus_cmd_confirm_msg_t *cfm)
+{
+    if (cfm)
+    {
+        printf("Get cmd confirm: cmdId=%04x\r\n", cfm->args.cmdId);
+        if (cfm->args.cmdId == BFLB_CMD_SLAVE_READY_IND)
+        {
+            printf("Recv cfm for slave ready indication\r\n");
+            fSlaveReadyIndSent = true;
+        }
+    }
+}
+
 static void send_heartbeat(TimerHandle_t xTimer)
 {
 #if defined(CFG_WATCHDOG_ENABLE)
     bl_wdt_feed();
 #endif
 
-    if (!fSentReady)
+    if (!fSlaveReadyIndSent)
     {
         send_ready_ind();
-        fSentReady = true;
     }
 
     netbus_slave_heartbeat_msg_t msg;
