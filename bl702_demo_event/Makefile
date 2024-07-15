@@ -29,7 +29,7 @@ endif
 INCLUDE_COMPONENTS += bl702 bl702_std newlibc bl702_rf hosal vfs yloop utils cli blog
 INCLUDE_COMPONENTS += blmtd blfdt
 INCLUDE_COMPONENTS += easyflash4 coredump
-INCLUDE_COMPONENTS += lmac154
+INCLUDE_COMPONENTS += lmac154 mfd
 
 ifeq ($(CONFIG_USB_CDC),1)
 INCLUDE_COMPONENTS += bl702_usb_cdc
@@ -46,9 +46,11 @@ else
 		INCLUDE_COMPONENTS += $(addprefix $(ZBSTACK_LIB_PREFIX), $(CONFIG_ZBSTACK_LIB))
 	endif
 endif
-INCLUDE_COMPONENTS += zbcli ecdsa macphy154
+INCLUDE_COMPONENTS += zbcli ecdsa macphy154 zcl
 ifeq ($(CONFIG_ZB_NCP_ENABLE), 1)
 INCLUDE_COMPONENTS += zbncp
+else
+INCLUDE_COMPONENTS += zbapp_common
 endif
 endif
 
@@ -73,9 +75,13 @@ endif
 endif
 
 ifeq ($(CONFIG_THREAD), 1)
-INCLUDE_COMPONENTS += mbedtls_lts mdns openthread openthread_port 
-INCLUDE_COMPONENTS += openthread_utils_bl702 openthread_br 
-CONFIG_ETHERNET ?= 1
+INCLUDE_COMPONENTS += thread openthread_port openthread_utils_bl702 openthread_br
+INCLUDE_COMPONENTS += mbedtls_lts lwip
+ifeq ($(CONFIG_LITTLEFS), 1)
+    INCLUDE_COMPONENTS += littlefs
+else ifeq ($(CONFIG_EASYFLASH_ENABLE), 1)
+    INCLUDE_COMPONENTS += easyflash4
+endif
 endif
 
 ifeq ($(CONFIG_ETHERNET),1)
@@ -107,17 +113,12 @@ endif
 INCLUDE_COMPONENTS += $(PROJECT_NAME)
 
 ifeq ($(CONFIG_THREAD),1)
-include $(BL60X_SDK_PATH)/components/network/thread/openthread_br/otbr_config.mk
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
 endif
 
 include $(BL60X_SDK_PATH)/make_scripts_riscv/project.mk
 ifeq ($(CONFIG_ZIGBEE), 1)
 include $(BL60X_SDK_PATH)/components/network/zigbee/zigbee_def.mk
-endif
-
-ifdef CONFIG_CACHE_SIZE
-EXTRA_LDFLAGS += -Wl,--defsym=__CACHE_SIZE=$(CONFIG_CACHE_SIZE)
 endif
 
 ifeq ($(CONFIG_BLECONTROLLER_LIB),all)

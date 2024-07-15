@@ -2,53 +2,32 @@
 
 # build for demo image
 # build options, 
-#   CONFIG_FTD, for thread device type
+#   OT_FTD, for thread device type
 #       1, build for thread FTD image, 
 #       0, build for thread MTD image
-#   CONFIG_PREFIX, set prefix for command cli
-CONFIG_FTD=1
+#   CONFIG_CHIP_REVISION, A0/A1 chip revision
+OT_FTD=1
+CONFIG_CHIP_REVISION=A1
+
+CONFIG_BUILD_ROM_CODE=0
 CONFIG_PREFIX=otc
 
-CONFIG_LINK_METRICS=1
-CONFIG_CSL_RX=1
-CONFIG_ENABLE_FP=1
-# OPENTHREAD_TESTS_UNIT=1
-
-OPENTHREAD_RADIO=0
-CONFIG_OPENTHREAD_CONFIG_THREAD_VERSION=4
-
-jobs=4
-if (( $1 -eq "" )); then
-jobs=$1
+if [[ "$CONFIG_CHIP_REVISION" != "A1" ]]; then
+    CONFIG_BUILD_ROM_CODE=1
 fi
+
+options="CONFIG_BUILD_ROM_CODE=${CONFIG_BUILD_ROM_CODE} CONFIG_CHIP_REVISION=${CONFIG_CHIP_REVISION} OT_FTD=$OT_FTD OT_CLI=1"
+if [[ "$CONFIG_PREFIX" != "" ]]; then
+    options=$options" CONFIG_PREFIX=$CONFIG_PREFIX"
+fi
+
+options=$options" CONFIG_EXTMBEDTLS_CONFIG_FILE=\"mbedtls_proj_config.h\""
+options=$options" CONFIG_OPENTHREAD_FILE=\"openthread-core-cli-config.h\""
+options=$options" CONFIG_OPENTHREAD_CHECK_FILE=\"openthread-core-platform-config-check.h\""
 
 if [ ! -d build_out ]; then
 mkdir build_out
 fi
-
-options="CONFIG_CPP_ENABLE=1 \
-    CONFIG_FTD=$CONFIG_FTD \
-    CONFIG_TIMESYNC=0 \
-    CONFIG_LINK_METRICS=$CONFIG_LINK_METRICS \
-    CONFIG_CSL_RX=$CONFIG_CSL_RX"
-
-options=$options" CONFIG_ENABLE_FP=$CONFIG_ENABLE_FP"
-
-if [[ "$CONFIG_PREFIX" != "" ]]; then
-    options=$options" CONFIG_PREFIX=\"$CONFIG_PREFIX\""
-fi
-
-if [[ "$OPENTHREAD_TESTS_UNIT" != "" ]]; then
-    options=$options" OPENTHREAD_TESTS_UNIT=$OPENTHREAD_TESTS_UNIT"
-fi
-
-options=$options" CONFIG_OPENTHREAD_CONFIG_THREAD_VERSION=$CONFIG_OPENTHREAD_CONFIG_THREAD_VERSION"
-options=$options" OPENTHREAD_RADIO=$OPENTHREAD_RADIO"
-
-options=$options" CONFIG_OPENTHREAD_CLI_ENABLE=1"
-
-options=$options" CONFIG_EXTMBEDTLS_CONFIG_FILE=\"third_party/mbedtls/mbedtls-config.h\""
-
-make $options -j $jobs 2>&1 | tee build_out/make.log
+make $options -j4 2>&1 | tee build_out/make.log
 
 exit $?

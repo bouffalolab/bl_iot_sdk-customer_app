@@ -14,7 +14,7 @@ extern err_t eth_init(struct netif *netif);
 
 static struct dhcp6 dhcp6_val;
 
-struct netif * otbr_getBackboneNetif(void) 
+struct netif * otbr_getInfraNetif(void) 
 {
     return &eth_mac;
 }

@@ -1182,7 +1182,7 @@ static int get_dts_addr(const char *name, uint32_t *start, uint32_t *off)
 
 static void proc_main_entry(void *pvParameters)
 {
-#if 1
+#if 0
     uint32_t fdt = 0, offset = 0;
     if (0 == get_dts_addr("gpio", &fdt, &offset)) {
         hal_gpio_init_from_dts(fdt, offset);

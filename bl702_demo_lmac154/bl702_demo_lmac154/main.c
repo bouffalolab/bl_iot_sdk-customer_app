@@ -66,7 +66,7 @@ void proc_hellow_entry(void *pvParameters)
 void _dump_lib_info(void)
 {
     puts("LMAC154 LIB Version: ");
-    puts(lmac154_getLibVersion());
+    puts(lmac154_getVersionString());
     puts("\r\n");
 }
 

@@ -229,29 +229,24 @@ SECTIONS
     *(.wifi_ram*)
     . = ALIGN(16);
 
-    KEEP(*liblwip.a:*(.sbss.*))
-    KEEP(*liblwip.a:*(.bss.*))
+    *liblwip.a:*(.sbss.* .bss.*)
+    . = ALIGN(16);
+    
+    *libbl702_ethernet.a:*(.bss.eth_mac)
     . = ALIGN(16);
 
-    KEEP(*libbl702_ethernet.a:*(.bss.eth_mac))
+    *libthread.a:*(.sbss.* .bss.*)
     . = ALIGN(16);
 
-    KEEP(*libmdns.a:*(.sbss.*))
-    KEEP(*libmdns.a:*(.bss.*))
+    *libopenthread_port.a:*(.sbss.* .bss.*)
     . = ALIGN(16);
 
-    KEEP(*libopenthread.a:*(.sbss.*))
-    KEEP(*libopenthread.a:*(.bss.*))
+    *libopenthread_br.a:*(.sbss.* .bss.*)
     . = ALIGN(16);
 
-    KEEP(*libopenthread_port.a:*(.sbss.*))
-    KEEP(*libopenthread_port.a:*(.bss.*))
-    . = ALIGN(16);
-
-    KEEP(*libopenthread_br.a:*(.sbss.*))
-    KEEP(*libopenthread_br.a:*(.bss.*))
   } > psram
   . = ALIGN(8);
+
   PROVIDE( _psram_end = . );
   PROVIDE( _heap3_start = . );
   PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );

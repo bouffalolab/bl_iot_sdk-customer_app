@@ -18,16 +18,15 @@ def sdk_app_fdt_tc(env, extra_data):
     dut.start_app()
 
     try:
-        dut.expect("Booting BL602 Chip...", timeout=1)
-        print('BL602 booted')
-        dut.expect('Init CLI with event Driven', timeout=1)
-        print('BL602 CLI init done')
-
+        time.sleep(3)
+        print('To reboot BL602')
+        dut.write('reboot')
+        dut.expect("Booting BL602 Chip...", timeout=0.5)
+        print('BL602 rebooted')
+        time.sleep(0.2)
         dut.write('fdt')
         dut.expect("fdt wifi module successed", timeout=2)
         dut.expect("dump successed", timeout=2)
-       
-        dut.halt()
     except DUT.ExpectTimeout:
         print('ENV_TEST_FAILURE: BL602 fdt test failed')
         raise

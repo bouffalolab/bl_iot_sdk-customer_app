@@ -18,14 +18,13 @@ def sdk_app_http_client_tcp_tc(env, extra_data):
     print('Starting app')
     dut.start_app()
 
-    try:
-        dut.expect("Booting BL602 Chip...", timeout=1)
-        print('BL602 booted')
-        dut.expect('Init CLI with event Driven', timeout=1)
-        print('BL602 CLI init done')
-        
-        time.sleep(1)
-
+    try:        
+        time.sleep(3)
+        print('To reboot BL602')
+        dut.write('reboot')
+        dut.expect("Booting BL602 Chip...", timeout=0.5)
+        print('BL602 rebooted')
+        time.sleep(0.2)
         dut.write('stack_wifi')
         time.sleep(0.5)
         bssid = os.getenv('TEST_ROUTER_SSID')

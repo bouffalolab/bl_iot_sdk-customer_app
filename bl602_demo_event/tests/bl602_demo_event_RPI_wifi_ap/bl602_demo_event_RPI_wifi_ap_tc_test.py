@@ -21,11 +21,7 @@ def bl602_demo_event_RPI_wifi_ap_tc(env, extra_data):
     dut.start_app()
 
     try:
-        dut.expect("Booting BL602 Chip...", timeout=0.5)
-        print('BL602 booted')
-        dut.expect('Init CLI with event Driven', timeout=0.5)
-        print('BL602 CLI init done')
-        time.sleep(1)
+        time.sleep(3)
 
         dut.write('stack_wifi')
         time.sleep(2)

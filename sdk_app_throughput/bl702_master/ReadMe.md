@@ -20,6 +20,9 @@
 
   Connect `PIN 3v3` and `PIN GND` to BL706 Board. 
 
+# Prebuilt_images
+  - [bl602_slave prebuilt image](../prebuilt_images/bl602_slave-15bfed04d.bin)
+
 ## Test
 
 UART command lines to connect to a Wi-Fi AP

@@ -28,7 +28,6 @@
 #include <hal_board.h>
 #include <hosal_uart.h>
 #include <hal_gpio.h>
-#include <hal_hwtimer.h>
 #include <hal_pds.h>
 #include <hal_tcal.h>
 
@@ -324,8 +323,6 @@ static void aos_loop_proc(void *pvParameters)
                          (void *)0x12345678);
         _cli_init();
     }
-
-    //hal_hwtimer_init();
 
     // cmd_master_lwip(NULL, NULL, NULL, NULL);
     aos_loop_run();

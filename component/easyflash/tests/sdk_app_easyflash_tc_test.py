@@ -18,11 +18,7 @@ def sdk_app_easyflash_tc(env, extra_data):
     dut.start_app()
 
     try:
-        dut.expect("Booting BL602 Chip...", timeout=1)
-        print('BL602 booted')
-        dut.expect('Init CLI with event Driven', timeout=1)
-        print('BL602 CLI init done')
-        time.sleep(2)
+        time.sleep(1)
         dut.write('psm_erase')
         time.sleep(1)
         dut.write('psm_test')

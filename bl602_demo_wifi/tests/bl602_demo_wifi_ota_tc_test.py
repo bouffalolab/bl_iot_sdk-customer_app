@@ -22,6 +22,7 @@ def bl602_demo_wifi_ota_tc(env, extra_data):
     dut.start_app()
 
     try:
+        time.sleep(3)
         nc = False
         cat = False
         dut.expect("Booting BL602 Chip...", timeout=5)

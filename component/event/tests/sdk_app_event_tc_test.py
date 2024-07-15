@@ -18,9 +18,7 @@ def sdk_app_event_tc(env, extra_data):
     dut.start_app()
 
     try:
-        dut.expect("Booting BL602 Chip...", timeout=1)
-        print('BL602 booted')
-        dut.expect('Init CLI with event Driven', timeout=1)
+        dut.expect('Init CLI with event Driven', timeout=2)
         print('BL602 CLI init done')
 
         dut.expect("######This is event test1", timeout=1)

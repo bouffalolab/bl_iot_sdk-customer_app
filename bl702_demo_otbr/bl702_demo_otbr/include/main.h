@@ -27,6 +27,7 @@ void cmd_connect(char *buf, int len, int argc, char **argv);
 void cmd_disconnect(char *buf, int len, int argc, char **argv);
 void cmd_scan(char *buf, int len, int argc, char **argv);
 void cmd_get_info(char *buf, int len, int argc, char **argv);
+void cmd_wifi_config(char *buf, int len, int argc, char **argv);
 
 void blsync_ble_start (void);
 void blsync_ble_stop (void);

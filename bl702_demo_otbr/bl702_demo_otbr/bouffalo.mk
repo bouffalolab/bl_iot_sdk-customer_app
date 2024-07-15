@@ -11,28 +11,18 @@ COMPONENT_SRCS := main.c
 
 ifeq ($(CONFIG_USE_WIFI_BR), 1)
 COMPONENT_SRCS += wifi_lwip.c
-ifeq ($(CONFIG_BT),1)
-include $(BL60X_SDK_PATH)/components/network/ble/ble_common.mk
-COMPONENT_SRCS += blsync_ble_app.c
-endif
 else
 COMPONENT_SRCS += eth_lwip.c
 endif
 
 CPPFLAGS += -DSYS_AOS_CLI_ENABLE
 
-ifeq ($(CONFIG_USB_CDC),1)
-CPPFLAGS += -DCFG_USB_CDC_ENABLE
-CFLAGS += -DCFG_USB_CDC_ENABLE
-endif
-
-ifeq ($(CONFIG_USE_PSRAM),1)
-CPPFLAGS += -DCFG_USE_PSRAM
-endif
-
 ifeq ($(CONFIG_USE_WIFI_BR), 1)
 CPPFLAGS += -DCFG_USE_WIFI_BR
 CPPFLAGS += -DCONF_USER_ENABLE_VFS_SPI
+ifeq ($(CONFIG_USE_DTS_SPI_CONFIG), 1)
+CPPFLAGS += -DCFG_USE_DTS_SPI_CONFIG
+endif
 endif
 
 ifeq ($(CONFIG_THREAD_AUTO_START), 1)

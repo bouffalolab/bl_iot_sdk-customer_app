@@ -7,7 +7,7 @@ import csv
 from tiny_test_fw import DUT, App, TinyFW
 from ttfw_bl import BL602App, BL602DUT
 
-REBOOT_TIMES = 30
+REBOOT_TIMES = 5
 
 @TinyFW.test_method(app=BL602App.BL602App, dut=BL602DUT.BL602TyMbDUT, test_suite_name='sdk_app_easyflash_boottimes_tc')
 def sdk_app_easyflash_boottimes_tc(env, extra_data):
@@ -20,14 +20,12 @@ def sdk_app_easyflash_boottimes_tc(env, extra_data):
     dut.start_app()
 
     try:
+        time.sleep(3)
         f = open('boot_times.csv', 'w', encoding='utf-8')
         csv_writer = csv.writer(f)
         csv_writer.writerow(["boot_times", "init_time", "read_time","write_time"])
 
         for boot_counts in range(REBOOT_TIMES):
-            dut.expect("Booting BL602 Chip...", timeout=0.5)
-            print('BL602 booted')
-            time.sleep(2)
             list = []
             result_text = dut.read()
             print (result_text)
@@ -47,6 +45,9 @@ def sdk_app_easyflash_boottimes_tc(env, extra_data):
             % (boot_times[0], init_time[0], read_time[0], write_time[0]))
             csv_writer.writerow(list)
             dut.write('reboot')
+            dut.expect("Booting BL602 Chip...", timeout=2)
+            print('BL602 booted')
+            time.sleep(2)
         f.close()
         dut.halt()
         

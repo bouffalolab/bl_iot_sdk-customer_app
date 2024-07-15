@@ -75,6 +75,8 @@ Type following command to build:
 
    Type `ipaddr`  to get IP address, and then `ping <ip address>` in command line of another device. And then sniffer tool should captured ICMPv6 packets.
 
+*Note, flash version may have limits to use enh-ack and CSL function due to flash access speed.*
+
 Please refer the [official page](https://openthread.google.cn/guides/build/commissioning) for more detail information.
 
 ### Execution - 2
