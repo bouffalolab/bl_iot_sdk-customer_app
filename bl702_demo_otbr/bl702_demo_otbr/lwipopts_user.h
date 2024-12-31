@@ -57,9 +57,10 @@ do {\
 #define MEMP_NUM_SYS_TIMEOUT            (LWIP_NUM_SYS_TIMEOUT_INTERNAL + OTBR_MAX_RIO_ROUTE)
 
 /* ---------- Pbuf options ---------- */
-#define PBUF_POOL_SIZE           30
-#define PBUF_POOL_BUFSIZE        1514
-#define LWIP_SUPPORT_CUSTOM_PBUF 1
+#define PBUF_POOL_SIZE                30
+#define PBUF_LINK_ENCAPSULATION_HLEN  48
+#define PBUF_POOL_BUFSIZE             (1514 + PBUF_LINK_ENCAPSULATION_HLEN)
+#define LWIP_SUPPORT_CUSTOM_PBUF      1
 
 /* ---------- Sequential layer options ----------*/
 #define LWIP_NETCONN 1

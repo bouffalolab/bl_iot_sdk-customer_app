@@ -88,3 +88,4 @@ endif
 ifeq ($(CONFIG_ZC_REPLACE_ENABLE), 1)
 CONFIG_EASYFLASH_ENABLE:=1
 endif
+

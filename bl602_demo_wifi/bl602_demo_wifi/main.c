@@ -725,11 +725,15 @@ static void wps_event_callback_(bl_wps_event_t event, void *payload, void *cb_ar
         wps_dbg("completed");
         ap_cred = (bl_wps_ap_credential_t *)payload;
         // ap_cred should always be valid
-        wps_dbg("AP SSID %s", ap_cred->ssid);
-        wps_dbg("AP passphrase %s", ap_cred->passphrase);
-        wps_dbg("connecting...");
+        wps_dbg("num of creds %zu", ap_cred->cnt);
+        for (size_t i = 0; i < ap_cred->cnt; ++i) {
+            wps_dbg("AP SSID %s", ap_cred->creds[i].ssid);
+            wps_dbg("AP passphrase %s", ap_cred->creds[i].passphrase);
+        }
+        // TODO: try other credentials if needed
+        wps_dbg("connecting first cred...");
         wifi_interface = wifi_mgmr_sta_enable();
-        wifi_mgmr_sta_connect(wifi_interface, (char *)ap_cred->ssid, ap_cred->passphrase, NULL,  NULL, 0, 0);
+        wifi_mgmr_sta_connect(wifi_interface, (char *)ap_cred->creds[0].ssid, ap_cred->creds[0].passphrase, NULL,  NULL, 0, 0);
         vPortFree(ap_cred);
         break;
     case BL_WPS_EVENT_TIMEOUT:

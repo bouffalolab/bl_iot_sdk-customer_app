@@ -301,12 +301,6 @@ void _dump_lib_info(void)
     puts(ble_controller_get_lib_ver());
     puts("\r\n");
 #endif
-
-#if defined(CFG_ZIGBEE_ENABLE)
-    puts("Zigbee LIB Version: ");
-    puts(zb_getLibVer());
-    puts("\r\n");
-#endif
 }
 
 static void system_init(void)

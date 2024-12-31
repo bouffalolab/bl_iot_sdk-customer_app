@@ -37,10 +37,8 @@ static int app_eth_callback(eth_link_state val)
 
         printf("start dhcp...\r\n");
 
-#if LWIP_IPV4
         /* start dhcp */
         netifapi_dhcp_start(&eth_mac);
-#endif
         break;
     case ETH_INIT_STEP_LINKDOWN:
         printf("Ethernet link down\r\n");
@@ -52,16 +50,15 @@ static int app_eth_callback(eth_link_state val)
 
 static void netif_status_callback(struct netif *netif)
 {
-    bool isIPv6AddressAssigend = false;
+    bool isIPv4AddressAssigend = false;
 
     if (netif->flags & NETIF_FLAG_UP) {
-#if LWIP_IPV4
         if(!ip4_addr_isany(netif_ip4_addr(netif))) {
             printf("IP: %s\r\n", ip4addr_ntoa(netif_ip4_addr(netif)));
             printf("MASK: %s\r\n", ip4addr_ntoa(netif_ip4_netmask(netif)));
             printf("Gateway: %s\r\n", ip4addr_ntoa(netif_ip4_gw(netif)));
+            isIPv4AddressAssigend = true;
         }
-#endif
 
         for (uint32_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i ++ ) {
             if (!ip6_addr_isany(netif_ip6_addr(netif, i))
@@ -77,12 +74,11 @@ static void netif_status_callback(struct netif *netif)
                 }
                 else{
                     printf("GLOBAL IP6 addr %s\r\n", ip6addr_ntoa(ip6addr));
-                    isIPv6AddressAssigend = true;
                 } 
             }
         }
 
-        if (isIPv6AddressAssigend) {
+        if (isIPv4AddressAssigend) {
             otbr_instance_routing_init();
         }
     }
@@ -93,11 +89,7 @@ static void netif_status_callback(struct netif *netif)
 
 void eth_lwip_init(void)
 {
-#if LWIP_IPV4
     netif_add(&eth_mac, NULL, NULL, NULL, NULL, eth_init, ethernet_input);
-#else
-    netif_add(&eth_mac, NULL, eth_init, ethernet_input);
-#endif
 
     ethernet_init(app_eth_callback);
 

@@ -12,6 +12,7 @@
 #if OPENTHREAD_CONFIG_BACKBONE_ROUTER_ENABLE
 #include <openthread/backbone_router_ftd.h>
 #endif /* OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE */
+#include <openthread/platform/settings.h>
 #include <openthread_port.h>
 
 #include <main.h>
@@ -226,6 +227,8 @@ int main(int argc, char *argv[])
 #if defined(CFG_USE_WIFI_BR)
     wifi_lwip_hw_reset();
 #endif /* CFG_USE_WIFI_BR */
+
+    otPlatSettingsInit(NULL, NULL, 0);
 
     opt.byte = 0;
 
