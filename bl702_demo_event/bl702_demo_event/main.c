@@ -1,3 +1,32 @@
+/*
+ * Copyright (c) 2016-2026 Bouffalolab.
+ *
+ * This file is part of
+ *     *** Bouffalolab Software Dev Kit ***
+ *      (see www.bouffalolab.com).
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
+ *      and/or other materials provided with the distribution.
+ *   3. Neither the name of Bouffalo Lab nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <FreeRTOS.h>
 #include <task.h>
 #include <timers.h>
@@ -70,7 +99,7 @@
 #include "autopts_uart.h"
 #endif
 
-#if defined(CFG_BLE_ENABLE)
+#if defined(CONFIG_BLE_ENABLE)
 #include "bluetooth.h"
 #include "ble_cli_cmds.h"
 #include <hci_driver.h>
@@ -152,16 +181,25 @@ static int app_eth_callback(eth_link_state val)
 {
     switch(val){
     case ETH_INIT_STEP_LINKUP:{
-
+        printf("Ethernet link up\r\n");
     }break;
     case ETH_INIT_STEP_READY:{
-        netif_set_default(&eth_mac);
-        netif_set_up(&eth_mac);
-        dhcp_start(&eth_mac);
-        printf("start dhcp....\r\n");
+        netifapi_netif_set_default(&eth_mac);
+        netifapi_netif_set_up(&eth_mac);
+        
+#if LWIP_IPV6
+        netif_create_ip6_linklocal_address(&eth_mac, 1);
+        eth_mac.ip6_autoconfig_enabled = 1;
+        dhcp6_set_struct(&eth_mac, &dhcp6_val);
+        dhcp6_enable_stateless(&eth_mac);
+#endif
+        printf("start dhcp...\r\n");
+
+        /* start dhcp */
+        netifapi_dhcp_start(&eth_mac);
     }break;
     case ETH_INIT_STEP_LINKDOWN:{
-
+        printf("Ethernet link down\r\n");
     }break;
     }
     return 0;
@@ -169,11 +207,7 @@ static int app_eth_callback(eth_link_state val)
 
 void lwip_init_netif(void)
 {
-    ip_addr_t ipaddr, netmask, gw;
-    IP4_ADDR(&ipaddr, 0,0,0,0);
-    IP4_ADDR(&netmask, 0,0,0,0);
-    IP4_ADDR(&gw, 0,0,0,0);
-    netif_add(&eth_mac, &ipaddr, &netmask, &gw, NULL, eth_init, ethernet_input);
+    netif_add(&eth_mac, NULL, NULL, NULL, NULL, eth_init, tcpip_input);
 
     ethernet_init(app_eth_callback);
     /* Set callback to be called when interface is brought up/down or address is changed while up */
@@ -265,7 +299,7 @@ void _cli_init(int fd_console)
 #endif /* CFG_ETHERNET_ENABLE */
 }
 
-#if defined(CFG_BLE_ENABLE)
+#if defined(CONFIG_BLE_ENABLE)
 void ble_init(void)
 {
     extern void ble_stack_start(void);
@@ -296,7 +330,7 @@ void zigbee_init(void)
 
 void _dump_lib_info(void)
 {
-#if defined(CFG_BLE_ENABLE)
+#if defined(CONFIG_BLE_ENABLE)
     puts("BLE Controller LIB Version: ");
     puts(ble_controller_get_lib_ver());
     puts("\r\n");
@@ -321,7 +355,7 @@ static void system_thread_init()
     }
 #endif /* CFG_ETHERNET_ENABLE */
 
-#if defined(CFG_BLE_ENABLE)
+#if defined(CONFIG_BLE_ENABLE)
     #if defined(CONFIG_AUTO_PTS)
     pts_uart_init(1,115200,8,1,0,0);
     // Initialize BLE controller

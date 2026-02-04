@@ -41,7 +41,7 @@
 #include "conn.h"
 #include "gatt.h"
 #include "hci_core.h"
-#include "uuid.h"
+#include "bt_uuid.h"
 //#include "oad_api.h"
 #include "bl_gpio.h"
 #include <vfs.h>

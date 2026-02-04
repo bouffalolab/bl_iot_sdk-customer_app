@@ -53,6 +53,12 @@ ifdef OT_NCP
     INCLUDE_COMPONENTS += openthread_ncp
 endif
 
+ifeq ($(CONFIG_BT),1)
+    INCLUDE_COMPONENTS += blecontroller_bl702_uarthci
+endif
+
 INCLUDE_COMPONENTS += $(PROJECT_NAME)
+
+CPPFLAGS += -DCONFIG_LITTLEFS_XIP_FLASH_READ
 
 include $(BL60X_SDK_PATH)/make_scripts_riscv/project.mk

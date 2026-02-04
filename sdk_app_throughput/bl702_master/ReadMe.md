@@ -21,7 +21,8 @@
   Connect `PIN 3v3` and `PIN GND` to BL706 Board. 
 
 # Prebuilt_images
-  - [bl602_slave prebuilt image](../prebuilt_images/bl602_slave-15bfed04d.bin)
+  - [bl602_slave prebuilt image](../prebuilt_images/bl602_slave-20260113-a8698f204.bin)
+  - [partition_cfg_2M.toml](..prebuilt_images/partition_cfg_2M.toml)
 
 ## Test
 

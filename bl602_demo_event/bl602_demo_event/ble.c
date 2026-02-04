@@ -1,3 +1,32 @@
+/*
+ * Copyright (c) 2016-2026 Bouffalolab.
+ *
+ * This file is part of
+ *     *** Bouffalolab Software Dev Kit ***
+ *      (see www.bouffalolab.com).
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
+ *      and/or other materials provided with the distribution.
+ *   3. Neither the name of Bouffalo Lab nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <FreeRTOS.h>
 #include <task.h>
 
@@ -17,14 +46,14 @@
 #include "mesh_cli_cmds.h"
 #if defined(CONFIG_BT_MESH_MODEL)
 #if (defined(CONFIG_BT_MESH_MODEL_GEN_SRV) || defined(CONFIG_BT_MESH_MODEL_GEN_CLI))
-#include "bfl_ble_mesh_generic_model_api.h"
+#include "bflb_ble_mesh_generic_model_api.h"
 #include "hal_gpio.h"
 #endif
 #if (defined(CONFIG_BT_MESH_MODEL_LIGHT_SRV) || defined(CONFIG_BT_MESH_MODEL_LIGHT_CLI))
-#include "bfl_ble_mesh_lighting_model_api.h"
+#include "bflb_ble_mesh_lighting_model_api.h"
 #endif
-#include "bfl_ble_mesh_local_data_operation_api.h"
-#include "bfl_ble_mesh_networking_api.h"
+#include "bflb_ble_mesh_local_data_operation_api.h"
+#include "bflb_ble_mesh_networking_api.h"
 #else
 #if (defined(CONFIG_BT_MESH_MODEL_GEN_SRV) || defined(CONFIG_BT_MESH_MODEL_GEN_CLI))
 #include "gen_srv.h"
@@ -69,19 +98,19 @@ void model_gen_cb(uint8_t value)
 }
 
 #if defined(CONFIG_BT_MESH_MODEL)
-static void example_handle_gen_onoff_msg(bfl_ble_mesh_model_t *model,
-										 bfl_ble_mesh_msg_ctx_t *ctx,
-										 bfl_ble_mesh_server_recv_gen_onoff_set_t *set)
+static void example_handle_gen_onoff_msg(bflb_ble_mesh_model_t *model,
+										 bflb_ble_mesh_msg_ctx_t *ctx,
+										 bflb_ble_mesh_server_recv_gen_onoff_set_t *set)
 {
-	bfl_ble_mesh_gen_onoff_srv_t *srv = model->user_data;
+	bflb_ble_mesh_gen_onoff_srv_t *srv = model->user_data;
 
 	switch (ctx->recv_op) {
-	case BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_GET:
-		bfl_ble_mesh_server_model_send_msg(model, ctx,
-			BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS, sizeof(srv->state.onoff), &srv->state.onoff);
+	case BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_GET:
+		bflb_ble_mesh_server_model_send_msg(model, ctx,
+			BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS, sizeof(srv->state.onoff), &srv->state.onoff);
 		break;
-	case BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET:
-	case BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK:
+	case BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET:
+	case BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK:
 		if (set->op_en == false) {
 			srv->state.onoff = set->onoff;
 		} else {
@@ -89,11 +118,11 @@ static void example_handle_gen_onoff_msg(bfl_ble_mesh_model_t *model,
 			srv->state.onoff = set->onoff;
 		}
         model_gen_cb(set->onoff);
-		if (ctx->recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET) {
-			bfl_ble_mesh_server_model_send_msg(model, ctx,
-				BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS, sizeof(srv->state.onoff), &srv->state.onoff);
+		if (ctx->recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET) {
+			bflb_ble_mesh_server_model_send_msg(model, ctx,
+				BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS, sizeof(srv->state.onoff), &srv->state.onoff);
 		}
-		bfl_ble_mesh_model_publish(model, BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS,
+		bflb_ble_mesh_model_publish(model, BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS,
 			sizeof(srv->state.onoff), &srv->state.onoff, ROLE_NODE);
 		break;
 	default:
@@ -102,34 +131,34 @@ static void example_handle_gen_onoff_msg(bfl_ble_mesh_model_t *model,
 }
 
 
-static void example_ble_mesh_generic_server_cb(bfl_ble_mesh_generic_server_cb_event_t event,
-                                               bfl_ble_mesh_generic_server_cb_param_t *param)
+static void example_ble_mesh_generic_server_cb(bflb_ble_mesh_generic_server_cb_event_t event,
+                                               bflb_ble_mesh_generic_server_cb_param_t *param)
 {
-    bfl_ble_mesh_gen_onoff_srv_t *srv;
+    bflb_ble_mesh_gen_onoff_srv_t *srv;
     printf("event 0x%02x, opcode 0x%04lx, src 0x%04x, dst 0x%04x\n",
         event, param->ctx.recv_op, param->ctx.addr, param->ctx.recv_dst);
 
     switch (event) {
-    case BFL_BLE_MESH_GENERIC_SERVER_STATE_CHANGE_EVT:
-        printf("BFL_BLE_MESH_GENERIC_SERVER_STATE_CHANGE_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
+    case BFLB_BLE_MESH_GENERIC_SERVER_STATE_CHANGE_EVT:
+        printf("BFLB_BLE_MESH_GENERIC_SERVER_STATE_CHANGE_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
             printf("onoff 0x%02x\n", param->value.state_change.onoff_set.onoff);
             model_gen_cb(param->value.state_change.onoff_set.onoff);
         }
         break;
-    case BFL_BLE_MESH_GENERIC_SERVER_RECV_GET_MSG_EVT:
-        printf("BFL_BLE_MESH_GENERIC_SERVER_RECV_GET_MSG_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_GET) {
+    case BFLB_BLE_MESH_GENERIC_SERVER_RECV_GET_MSG_EVT:
+        printf("BFLB_BLE_MESH_GENERIC_SERVER_RECV_GET_MSG_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_GET) {
             srv = param->model->user_data;
             printf("onoff 0x%02x\n", srv->state.onoff);
             example_handle_gen_onoff_msg(param->model, &param->ctx, NULL);
         }
         break;
-    case BFL_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT:
-        printf("BFL_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
+    case BFLB_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT:
+        printf("BFLB_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
             printf("onoff 0x%02x, tid 0x%02x\n", param->value.set.onoff.onoff, param->value.set.onoff.tid);
             if (param->value.set.onoff.op_en) {
                 printf("trans_time 0x%02x, delay 0x%02x\n",
@@ -146,30 +175,30 @@ static void example_ble_mesh_generic_server_cb(bfl_ble_mesh_generic_server_cb_ev
 #endif/*CONFIG_BT_MESH_MODEL_GEN_SRV*/
 
 #if defined(CONFIG_BT_MESH_MODEL_LIGHT_SRV)
-static void example_handle_light_lgn_msg(bfl_ble_mesh_model_t *model,
-										 bfl_ble_mesh_msg_ctx_t *ctx,
-										 bfl_ble_mesh_server_recv_light_lightness_set_t *set)
+static void example_handle_light_lgn_msg(bflb_ble_mesh_model_t *model,
+										 bflb_ble_mesh_msg_ctx_t *ctx,
+										 bflb_ble_mesh_server_recv_light_lightness_set_t *set)
 {
-	bfl_ble_mesh_light_lightness_srv_t *srv = model->user_data;
+	bflb_ble_mesh_light_lightness_srv_t *srv = model->user_data;
 
 	switch (ctx->recv_op) {
-	case BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_GET:
-		bfl_ble_mesh_server_model_send_msg(model, ctx,
-			BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS, sizeof(srv->state->lightness_actual), (uint8_t*)&srv->state->lightness_actual);
+	case BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_GET:
+		bflb_ble_mesh_server_model_send_msg(model, ctx,
+			BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS, sizeof(srv->state->lightness_actual), (uint8_t*)&srv->state->lightness_actual);
 		break;
-	case BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET:
-	case BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK:
+	case BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET:
+	case BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK:
 		if (set->op_en == false) {
 			srv->state->lightness_actual = set->lightness;
 		} else {
 			/* TODO: Delay and state transition */
 			srv->state->lightness_actual = set->lightness;
 		}
-		if (ctx->recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET) {
-			bfl_ble_mesh_server_model_send_msg(model, ctx,
-				BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS, sizeof(srv->state->lightness_actual), (uint8_t*)&srv->state->lightness_actual);
+		if (ctx->recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET) {
+			bflb_ble_mesh_server_model_send_msg(model, ctx,
+				BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS, sizeof(srv->state->lightness_actual), (uint8_t*)&srv->state->lightness_actual);
 		}
-		bfl_ble_mesh_model_publish(model, BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS,
+		bflb_ble_mesh_model_publish(model, BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_STATUS,
 			sizeof(srv->state->lightness_actual), (uint8_t*)&srv->state->lightness_actual, ROLE_NODE);
 		break;
 	default:
@@ -178,51 +207,51 @@ static void example_handle_light_lgn_msg(bfl_ble_mesh_model_t *model,
 }
 
 
-static void example_ble_mesh_lighting_server_cb(bfl_ble_mesh_lighting_server_cb_event_t event,
-			bfl_ble_mesh_lighting_server_cb_param_t *param)
+static void example_ble_mesh_lighting_server_cb(bflb_ble_mesh_lighting_server_cb_event_t event,
+			bflb_ble_mesh_lighting_server_cb_param_t *param)
 {
     printf("event 0x%02x, opcode 0x%04lx, src 0x%04x, dst 0x%04x\n",
         event, param->ctx.recv_op, param->ctx.addr, param->ctx.recv_dst);
 
     switch (event) {
-    case BFL_BLE_MESH_LIGHTING_SERVER_STATE_CHANGE_EVT:
-        printf("BFL_BLE_MESH_LIGHTING_SERVER_STATE_CHANGE_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK) {
+    case BFLB_BLE_MESH_LIGHTING_SERVER_STATE_CHANGE_EVT:
+        printf("BFLB_BLE_MESH_LIGHTING_SERVER_STATE_CHANGE_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK) {
             printf("Light lightness [%x]\n", param->value.state_change.lightness_set.lightness);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_CTL_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_CTL_SET_UNACK) {
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_CTL_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_CTL_SET_UNACK) {
             printf("Light ctl ln[%x]tp[%x]uv[%x]\n", 
 				param->value.state_change.ctl_set.lightness,
 				param->value.state_change.ctl_set.temperature,
 				param->value.state_change.ctl_set.delta_uv);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_HSL_SET ||
-	        param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_HSL_SET_UNACK) {
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_HSL_SET ||
+	        param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_HSL_SET_UNACK) {
 	        printf("Light hsl l[%x]h[%x]s[%x]\n", 
 				param->value.state_change.hsl_set.lightness,
 				param->value.state_change.hsl_set.hue,
 				param->value.state_change.hsl_set.saturation);
         }
         break;
-    case BFL_BLE_MESH_LIGHTING_SERVER_RECV_GET_MSG_EVT:
-        printf("BFL_BLE_MESH_LIGHTING_SERVER_RECV_GET_MSG_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_GET) {
-            bfl_ble_mesh_light_lightness_srv_t *srv = param->model->user_data;
+    case BFLB_BLE_MESH_LIGHTING_SERVER_RECV_GET_MSG_EVT:
+        printf("BFLB_BLE_MESH_LIGHTING_SERVER_RECV_GET_MSG_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_GET) {
+            bflb_ble_mesh_light_lightness_srv_t *srv = param->model->user_data;
             printf("onoff 0x%02x\n", srv->state->lightness_actual);
             example_handle_light_lgn_msg(param->model, &param->ctx, NULL);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_CTL_GET) {
-            bfl_ble_mesh_light_ctl_srv_t *srv = param->model->user_data;
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_CTL_GET) {
+            bflb_ble_mesh_light_ctl_srv_t *srv = param->model->user_data;
             printf("Light ctl ln[%x]ln_t[%x] tp[%x]tp_t[%x] uv[%x]uv_t[%x]\n", 
             		srv->state->lightness, srv->state->target_lightness,
             		srv->state->temperature, srv->state->target_temperature,
             		srv->state->delta_uv, srv->state->target_delta_uv);
             //example_handle_gen_onoff_msg(param->model, &param->ctx, NULL);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_HSL_GET) {
-            bfl_ble_mesh_light_hsl_srv_t *srv = param->model->user_data;
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_HSL_GET) {
+            bflb_ble_mesh_light_hsl_srv_t *srv = param->model->user_data;
             printf("Light ctl l[%x]l_t[%x] h[%x]h_t[%x] s[%x]s_t[%x]\n", 
             		srv->state->lightness, srv->state->target_lightness,
             		srv->state->hue, srv->state->target_hue,
@@ -230,10 +259,10 @@ static void example_ble_mesh_lighting_server_cb(bfl_ble_mesh_lighting_server_cb_
             //example_handle_gen_onoff_msg(param->model, &param->ctx, NULL);
         }
         break;
-    case BFL_BLE_MESH_LIGHTING_SERVER_RECV_SET_MSG_EVT:
-        printf("BFL_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT\n");
-        if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK) {
+    case BFLB_BLE_MESH_LIGHTING_SERVER_RECV_SET_MSG_EVT:
+        printf("BFLB_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT\n");
+        if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_LIGHTNESS_SET_UNACK) {
             printf("Light lightness [%x], tid[%x]\n", param->value.set.lightness.lightness, param->value.set.lightness.tid);
             if (param->value.set.lightness.op_en) {
                 printf("trans_time [%x], delay [%x]\n",
@@ -241,8 +270,8 @@ static void example_ble_mesh_lighting_server_cb(bfl_ble_mesh_lighting_server_cb_
             }
             example_handle_light_lgn_msg(param->model, &param->ctx, &param->value.set.lightness);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_CTL_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_CTL_SET_UNACK) {
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_CTL_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_CTL_SET_UNACK) {
             printf("Light ctl ln[%x] tp[%d] uv[%x] tid[%x]\n", 
 				param->value.set.ctl.lightness,
 				param->value.set.ctl.temperature,
@@ -254,8 +283,8 @@ static void example_ble_mesh_lighting_server_cb(bfl_ble_mesh_lighting_server_cb_
             }
             //example_handle_gen_onoff_msg(param->model, &param->ctx, &param->value.set.onoff);
         }
-		else if (param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_HSL_SET ||
-            param->ctx.recv_op == BFL_BLE_MESH_MODEL_OP_LIGHT_HSL_SET_UNACK) {
+		else if (param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_HSL_SET ||
+            param->ctx.recv_op == BFLB_BLE_MESH_MODEL_OP_LIGHT_HSL_SET_UNACK) {
             printf("Light hsl l[%x] h[%d] s[%x] tid[%x]\n", 
 				param->value.set.hsl.lightness,
 				param->value.set.hsl.hue,
@@ -311,10 +340,10 @@ void bt_enable_cb(int err)
         blemesh_cli_register();
 #if defined(CONFIG_BT_MESH_MODEL)
 #if defined(CONFIG_BT_MESH_MODEL_GEN_SRV)
-		bfl_ble_mesh_register_generic_server_callback(example_ble_mesh_generic_server_cb);
+		bflb_ble_mesh_register_generic_server_callback(example_ble_mesh_generic_server_cb);
 #endif
 #if defined(CONFIG_BT_MESH_MODEL_LIGHT_SRV)
-		bfl_ble_mesh_register_lighting_server_callback(example_ble_mesh_lighting_server_cb);
+		bflb_ble_mesh_register_lighting_server_callback(example_ble_mesh_lighting_server_cb);
 #endif
 #else
 		mesh_gen_srv_callback_register(model_gen_cb);

@@ -1,7 +1,8 @@
 #!/bin/bash
 
-options="CONFIG_USB_CDC=0 OT_FTD=1 OT_CLI=1 CONFIG_PREFIX=otc"
-
+options="CONFIG_USB_CDC=0 OT_FTD=1 OT_CLI=1"
+options="CONFIG_SYS_AOS_CLI_ENABLE=1 CONFIG_PREFIX=otc"
+options=$options" CONFIG_BT=1"
 options=$options" CONFIG_EXTMBEDTLS_CONFIG_FILE=\"mbedtls_proj_config.h\""
 options=$options" CONFIG_OPENTHREAD_FILE=\"openthread-core-cli-config.h\""
 options=$options" CONFIG_OPENTHREAD_CHECK_FILE=\"openthread-core-platform-config-check.h\""

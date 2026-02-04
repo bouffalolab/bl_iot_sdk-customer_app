@@ -20,10 +20,10 @@ endif
 
 COMPONENTS_NETWORK := sntp dns_server
 COMPONENTS_BLSYS   := bltime blfdt blmtd blota bloop loopadc looprt loopset
-COMPONENTS_BLE     := blecontroller_602_m1s1 blestack
+COMPONENTS_BLE     := blecontroller_bl602_m1s1 blestack
 COMPONENTS_VFS     := romfs cjson
 
-INCLUDE_COMPONENTS += freertos_riscv_ram bl602 bl602_std newlibc wifi wifi_manager wpa_supplicant bl_os_adapter wifi_hosal hosal mbedtls_lts lwip lwip_dhcpd vfs yloop utils cli blog blcrypto_suite rfparam_adapter_tmp
+INCLUDE_COMPONENTS += freertos_riscv_ram bl602 bl602_std newlibc wifi wifi_manager wpa_supplicant bl_os_adapter wifi4_adapter hosal mbedtls_lts lwip lwip_dhcpd vfs yloop utils cli blog blcrypto_suite rfparam_adapter_tmp
 ifeq ($(CONFIG_BT_SETTINGS),1)
 INCLUDE_COMPONENTS += easyflash4
 endif

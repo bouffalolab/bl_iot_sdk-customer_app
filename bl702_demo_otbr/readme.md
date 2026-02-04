@@ -15,6 +15,7 @@ Type following command to build:
 - Build control on Ethernet OTBR or Wi-Fi OTBR
   - `CONFIG_USE_WIFI_BR=0` in `genromap` is for Ethernet OTBR build
   - `CONFIG_USE_WIFI_BR=1` in `genromap` is for Wi-Fi OTBR build
+    - BL702 will toggle reset pin of BL602 during startup to make both chips have same fresh state. Please refer to `bl_factory_params_IoTKitA_32M_evb.dts` and configure `gpio_reset` with true settings.
 
 - Build to auto form a Thread Network.
   - `CONFIG_THREAD_AUTO_START=1` in `genromap` enables to form a Thread network after it is assigned IPv6 address. 
@@ -35,17 +36,7 @@ Type following command to build:
 
   - `CONFIG_LITTLEFS`, save Thread network stack information to PSM partition managed by littlefs by default
 
-    littlefs requires more flash size and please refer to `bl702_demo_otbr/partition_cfg_2M.toml`
-
-
-
-
-`proj_config.mk` has following two options:
-
-| option                  | comments                                                     |
-| ----------------------- | ------------------------------------------------------------ |
-| CONFIG_EASYFLASH_ENABLE |                                                              |
-| CONFIG_LITTLEFS         | save Thread network stack information to PSM partition managed by littlefs by default<br>littlefs requires more flash size and please refer to `bl702_demo_thread/partition_cfg_1M.toml` |
+    > littlefs requires more flash size and please refer to `bl702_demo_otbr/partition_cfg_2M.toml`
 
 # Ethernet OTBR
 
@@ -73,7 +64,7 @@ Type following command to build:
   - Then Thread network will automatically start if `CONFIG_THREAD_AUTO_START=1`. 
 
 # Some helpful commands:
-  - Command `ipinfo`: to get assigned IP address.
+  - Command `ifconfig`: to get assigned IP address.
   - Command `otc state`: to get Thread state. 
   - Command `otc br state`: to get Border Router state. 
     - state `running` means border router is running after it attached and IP address is assigned.

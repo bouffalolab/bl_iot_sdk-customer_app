@@ -236,7 +236,8 @@ SECTIONS
     *libthread.a:*(.sbss.* .bss.*)
     . = ALIGN(16);
 
-    *libopenthread_port.a:*(.sbss.* .bss.*)
+    KEEP(*libopenthread_port.a:*(EXCLUDE_FILE(*ot_radio.o) .bss.*))
+    KEEP(*libopenthread_port.a:*(EXCLUDE_FILE(*ot_radio.o) .sbss.*))
     . = ALIGN(16);
 
     *libopenthread_br.a:*(.sbss.* .bss.*)

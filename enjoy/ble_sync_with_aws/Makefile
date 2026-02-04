@@ -11,7 +11,7 @@ export PROJECT_PATH PROJECT_BOARD
 
 BLECONTROLLER_LIBS := m1s1 m0s1 m0s1s
 BLECONTROLLER_LIB_DEFAULT := m1s1
-BLECONTROLLER_LIB_PREFIX := blecontroller_602_
+BLECONTROLLER_LIB_PREFIX := blecontroller_bl602_
 
 -include ./proj_config.mk
 
@@ -42,7 +42,7 @@ else
 COMPONENTS_BLE     := $(COMPONENTS_BLECONTROLLER) blestack
 endif
 
-INCLUDE_COMPONENTS += freertos_riscv_ram bl602 bl602_std newlibc wifi wifi_manager wpa_supplicant hosal mbedtls_lts lwip lwip_dhcpd vfs yloop utils cli aws-iot httpc netutils blog blog_testc blsync_ble cjson blcrypto_suite bl_os_adapter wifi_hosal
+INCLUDE_COMPONENTS += freertos_riscv_ram bl602 bl602_std newlibc wifi wifi_manager wpa_supplicant hosal mbedtls_lts lwip lwip_dhcpd vfs yloop utils cli aws-iot httpc netutils blog blog_testc blsync_ble cjson blcrypto_suite bl_os_adapter wifi4_adapter
 INCLUDE_COMPONENTS += easyflash4 coredump rfparam_adapter_tmp
 INCLUDE_COMPONENTS += $(COMPONENTS_NETWORK)
 INCLUDE_COMPONENTS += $(COMPONENTS_BLSYS)

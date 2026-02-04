@@ -44,5 +44,7 @@ else
     endif
 endif
 
+CPPFLAGS += -DCONFIG_LITTLEFS_XIP_FLASH_READ
+
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
 include $(BL60X_SDK_PATH)/make_scripts_riscv/project.mk

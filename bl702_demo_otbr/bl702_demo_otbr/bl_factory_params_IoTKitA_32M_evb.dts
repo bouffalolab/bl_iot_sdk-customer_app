@@ -14,7 +14,8 @@
         max_num = <40>;
         gpio_reset {
             status = "okay";
-            pin  = <11>;
+            pin  = <11>; // pin connects to reset pin of Wi-Fi module
+            boot = <1>;  // pin connects to boot pin of Wi-Fi module
         };
     };
     uart {

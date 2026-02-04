@@ -25,7 +25,7 @@ SOC_DRV = $(shell echo $(CONFIG_CHIP_NAME) | tr A-Z a-z)
 
 INCLUDE_COMPONENTS += $(SOC_DRV) $(SOC_DRV)_std
 INCLUDE_COMPONENTS += freertos_riscv_ram hosal cli vfs yloop utils blog blog_testc throughput newlibc easyflash4 coredump 
-INCLUDE_COMPONENTS += tpsync wifi blcrypto_suite wifi_manager wpa_supplicant bl_os_adapter wifi_hosal rfparam_adapter_tmp netutils mbedtls_lts httpc dns_server lwip lwip_dhcpd
+INCLUDE_COMPONENTS += tpsync wifi blcrypto_suite wifi_manager wpa_supplicant bl_os_adapter wifi4_adapter rfparam_adapter_tmp netutils mbedtls_lts httpc dns_server lwip lwip_dhcpd
 INCLUDE_COMPONENTS += $(COMPONENTS_NETWORK)
 INCLUDE_COMPONENTS += $(COMPONENTS_BLSYS)
 INCLUDE_COMPONENTS += $(COMPONENTS_VFS)

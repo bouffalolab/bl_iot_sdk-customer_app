@@ -134,18 +134,21 @@ While，directly configuring dataset to attach the device to the network also wo
 ## NCP/RCP example
 ### Build
 
-Type following command to build:
+Run the following scripts to build example:
 
 ```shell
+# OT NCP example
 ./genotncp
+# OT RCP example
+./genotrcp
 ```
 
-`genotcli` script has two following build options NCP image.
+The scripts have two following build options NCP image.
 
-| option        | comments                                                     |
-| ------------- | ------------------------------------------------------------ |
-| OT_NCP        | `1`, build NCP device, and `OT_FTD` option is valid to configure <br />`0`, build RCP device. |
-| OT_FTD        | `0`, build MTD image;<br />`1`, build FTD image. |
+| option    | comments                                                     |
+| --------- | ------------------------------------------------------------ |
+| OT_FTD    | Only available for `genotncp`<br />`0`, build MTD image;<br />`1`, build FTD image. |
+| CONFIG_BT | `0`, build without BLE controller<br />`1`, build with BLE controller enabled on UART 1 with PIN 3/4 |
 
 > **NOTE**, NCP/RCP only works with UART.
 ### pyspinel

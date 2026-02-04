@@ -52,10 +52,12 @@ else
     endif
 endif
 
-INCLUDE_COMPONENTS += thread openthread_port openthread_utils_bl702 openthread_br
+INCLUDE_COMPONENTS += cjson
+INCLUDE_COMPONENTS += thread openthread_port openthread_utils_bl702 openthread_br openthread_rest
 INCLUDE_COMPONENTS += $(PROJECT_NAME)
 
 CPPFLAGS += -DINCLUDE_xTaskGetHandle=1
+CPPFLAGS += -DCONFIG_LITTLEFS_XIP_FLASH_READ
 
 include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
 
