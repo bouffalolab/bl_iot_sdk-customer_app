@@ -421,6 +421,7 @@ static void proc_main_entry(void *pvParameters)
 
     aos_register_event_filter(EV_WIFI, event_cb_wifi_event, NULL);
     cmd_stack_wifi(NULL, 0, 0, NULL);
+    send_ready_ind();
     app_startHeartbeat();
 
     vTaskDelete(NULL);
