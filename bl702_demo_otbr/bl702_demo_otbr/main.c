@@ -30,10 +30,19 @@
 #include <bl_rtc.h>
 #include <hal_tcal.h>
 
+#include <bl702.h>
+#include <bl_timer.h>
+#include <bl_wireless.h>
+#include <bl_irq.h>
+#include <lmac154.h>
+#include <lmac154_fpt.h>
+#include <zb_timer.h>
+
 #include <cli.h>
 
 #include <lwip/tcpip.h>
 
+#include OPENTHREAD_PROJECT_CORE_CONFIG_FILE
 #include <openthread/dataset_ftd.h>
 #if OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE
 #include <openthread/border_router.h>
@@ -44,6 +53,8 @@
 #include <openthread/platform/settings.h>
 #include <openthread_port.h>
 #include <openthread_rest.h>
+#include <openthread_br.h>
+#include <otbr_rtos_lwip.h>
 
 #include <main.h>
 
@@ -255,12 +266,30 @@ void otrInitUser(otInstance * instance)
 #endif
     
     otbr_netif_init();
+    otbr_nat64_init(OPENTHREAD_OTBR_CONFIG_NAT64_CIDR);
+}
+
+static void lmac154_app_init(void)
+{
+    lmac154_init();
+    lmac154_enableCoex();
+    lmac154_setStd2015Extra(true);
+    lmac154_setTxRetry(0);
+    lmac154_fptClear();
+    lmac154_setEnhAckWaitTime((LMAC154_AIFS + 10 + (6 + 42) * 2) << LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_setRxStateWhenIdle(true);
+
+    lmac154_setTxRxTransTime(0xA0);
+
+    zb_timer_cfg(bl_timer_now_us64() >> LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_disableRx();
+
+    bl_irq_register(M154_IRQn, lmac154_getInterruptCallback());
+    bl_irq_enable(M154_IRQn);
 }
 
 int main(int argc, char *argv[])
 {
-    otRadio_opt_t opt;
-
     bl_rtc_init();
     hal_tcal_init();
 
@@ -269,21 +298,6 @@ int main(int argc, char *argv[])
 #endif /* CFG_USE_WIFI_BR */
 
     otPlatSettingsInit(NULL, NULL, 0);
-
-    opt.byte = 0;
-
-#if OPENTHREAD_FTD
-    opt.bf.isFtd = true;
-#endif
-#if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
-    opt.bf.isLinkMetricEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
-    opt.bf.isCSLReceiverEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_TIME_SYNC_ENABLE
-    opt.bf.isTimeSyncEnable = true;
-#endif
 
     tcpip_init(NULL, NULL);
 
@@ -295,7 +309,9 @@ int main(int argc, char *argv[])
     
     openthread_httpd_init(8081);
 
-    otrStart(opt);
+    lmac154_app_init();
+
+    otrStart();
 
     return 0;
 }

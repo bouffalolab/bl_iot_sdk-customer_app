@@ -67,8 +67,9 @@ do {\
 **/
 
 /* ---------- OTBR options ---------- */
-#define OTBR_LOCK_TCPIP_CORE()
-#define OTBR_UNLOCK_TCPIP_CORE()
+#define OTBR_LWIP_ASSERT_CORE_LOCKED()          otbr_lwip_assert_core_locked(__FILE__, __LINE__)
+#define OTBR_LWIP_LOCK_TCPIP_CORE()             otbr_lwip_lock_tcpip_core()
+#define OTBR_LWIP_UNLOCK_TCPIP_CORE()           otbr_lwip_unlock_tcpip_core()
 
 #define OTBR_MAX_RIO_ROUTE 20
 #define OTBR_RIO_TIMEOUT 0xffffffff / (1000 * 4)

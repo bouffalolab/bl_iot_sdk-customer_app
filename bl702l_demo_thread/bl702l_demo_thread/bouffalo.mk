@@ -22,10 +22,6 @@ ifeq ($(CONFIG_CSL_RX), 1)
 CPPFLAGS += -DCFG_CSL_RX
 endif
 
-ifdef OT_NCP
-CPPFLAGS += -DOT_NCP
-endif
-
 ## not be exported to project level
 COMPONENT_PRIV_INCLUDEDIRS :=
 

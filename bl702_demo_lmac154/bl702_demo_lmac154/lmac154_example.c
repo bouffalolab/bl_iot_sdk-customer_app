@@ -250,7 +250,7 @@ void lmac154_ackEvent(uint8_t ack_received, uint8_t frame_pending, uint8_t seq_n
     }
 }
 
-void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint8_t crc_fail)
+void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint32_t crc_fail)
 {
     if(rx_buf[2] == SEQ_NUM && rx_len == LMAC154_PKT_SIZE + 2){
         rx_cnt++;
@@ -282,7 +282,7 @@ void lmac154_ackEvent(uint8_t ack_received, uint8_t frame_pending, uint8_t seq_n
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint8_t crc_fail)
+void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint32_t crc_fail)
 {
     int rssi;
     int rssi_avg;
@@ -329,7 +329,7 @@ void lmac154_ackEvent(uint8_t ack_received, uint8_t frame_pending, uint8_t seq_n
     }
 }
 
-void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint8_t crc_fail)
+void lmac154_rxDoneEvent(uint8_t *rx_buf, uint8_t rx_len, uint32_t crc_fail)
 {
     int i;
     

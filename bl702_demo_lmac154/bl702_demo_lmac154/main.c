@@ -46,8 +46,7 @@ void vApplicationTickHook( void )
     usb_cdc_monitor();
 #endif
 
-    extern void lmac154_monitor(void);
-    lmac154_monitor();
+    lmac154_monitor(10000);
 }
 #endif
 

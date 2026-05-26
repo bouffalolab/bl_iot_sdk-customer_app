@@ -48,10 +48,7 @@ else
     endif
 endif
 
-INCLUDE_COMPONENTS += thread openthread_port openthread_utils_bl702
-ifdef OT_NCP
-    INCLUDE_COMPONENTS += openthread_ncp
-endif
+INCLUDE_COMPONENTS += thread openthread_port
 
 ifeq ($(CONFIG_BT),1)
     INCLUDE_COMPONENTS += blecontroller_bl702_uarthci

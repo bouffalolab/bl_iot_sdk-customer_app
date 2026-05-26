@@ -42,6 +42,8 @@
 
 #include <openthread/platform/settings.h>
 #include <openthread_port.h>
+#include <openthread_br.h>
+#include <otbr_rtos_lwip.h>
 
 #include "main.h"
 
@@ -105,9 +107,9 @@ void wifi_lwip_hw_reset(void)
     bl_gpio_output_set(reset_pin, 1);
 }
 
-struct netif * otbr_getInfraNetif(void) 
+otbr_lwip_netif_type_t otbr_getInfraNetif(void) 
 {
-    return (struct netif*)&vnet_spi->netif;
+    return (otbr_lwip_netif_type_t)&vnet_spi->netif;
 }
 
 /* event callback */

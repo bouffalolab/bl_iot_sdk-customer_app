@@ -28,9 +28,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <stdio.h>
-#ifdef CFG_USE_FLASH_CODE
+#include <bl702l.h>
 #include <bl_flash.h>
-#endif
+#include <bl_timer.h>
+#include <bl_irq.h>
+#include <lmac154.h>
+#include <lmac154_fpt.h>
+#include <zb_timer.h>
 #include <openthread_port.h>
 #include <openthread/thread.h>
 #include <openthread/thread_ftd.h>
@@ -38,7 +42,6 @@
 #include <openthread/cli.h>
 #include <openthread/ncp.h>
 #include <openthread/coap.h>
-#include <ot_utils_ext.h>
 
 #ifdef SYS_AOS_CLI_ENABLE
 void _cli_init(int fd_console)
@@ -49,7 +52,7 @@ void _cli_init(int fd_console)
 
 void otrInitUser(otInstance * instance)
 {
-#ifdef OT_NCP
+#if CONFIG_OT_NCP || CONFIG_OT_RCP
     otAppNcpInit((otInstance * )instance);
 #else
     otAppCliInit((otInstance * )instance);
@@ -64,33 +67,36 @@ void otrAppProcess(ot_system_event_t sevent)
 
 }
 
-int main(int argc, char *argv[])
+static void lmac154_app_init(void)
 {
-    otRadio_opt_t opt;
+    lmac154_init();
+    lmac154_enableCoex();
+    lmac154_setStd2015Extra(true);
+    lmac154_setTxRetry(0);
+    lmac154_fptClear();
+    lmac154_setEnhAckWaitTime((LMAC154_AIFS + 10 + (6 + 42) * 2) << LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_setRxStateWhenIdle(true);
 
-#ifdef CFG_USE_FLASH_CODE
-    bl_flash_init();
-#endif
-
-    ot_utils_init();
-
-    opt.byte = 0;
+    lmac154_setTxRxTransTime(0xA0);
 
 #if OPENTHREAD_FTD
-    opt.bf.isFtd = true;
+    lmac154_setFramePendingMode(LMAC154_FPT_ANY);
 #endif
 
-#if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
-    opt.bf.isLinkMetricEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
-    opt.bf.isCSLReceiverEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_TIME_SYNC_ENABLE
-    opt.bf.isTimeSyncEnable = true;
-#endif
+    zb_timer_cfg(bl_timer_now_us64() >> LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_disableRx();
 
-    otrStart(opt);
+    bl_irq_register(M154_IRQn, lmac154_getInterruptCallback());
+    bl_irq_enable(M154_IRQn);
+}
+
+int main(int argc, char *argv[])
+{
+    bl_flash_init();
+
+    lmac154_app_init();
+
+    otrStart();
 
     return 0;
 }

@@ -1,18 +1,16 @@
 #!/bin/bash
 
-# build for demo image
-# build options, 
-#   OT_FTD, for thread device type
-#       1, build for thread FTD image, 
+# build for CLI mode image
+# build options,
+#   CONFIG_OT_FTD, for thread device type
+#       1, build for thread FTD image,
 #       0, build for thread MTD image
-OT_FTD=1
-CONFIG_PREFIX=otc
+CONFIG_OT_FTD=1
+CONFIG_OT_MTD=0
 
-options="CONFIG_BUILD_ROM_CODE=1 OT_FTD=$OT_FTD OT_CLI=1"
-if [[ "$CONFIG_PREFIX" != "" ]]; then
-    options=$options" CONFIG_PREFIX=$CONFIG_PREFIX"
-fi
-
+options="CONFIG_OT_CLI=shell CONFIG_OT_FTD=$CONFIG_OT_FTD CONFIG_OT_MTD=${CONFIG_OT_MTD}"
+options=$options" CONFIG_OPENTHREAD_CLI_ENABLE=1 CONFIG_SYS_AOS_CLI_ENABLE=1 "
+options=$options" CONFIG_BT=0"
 options=$options" CONFIG_EXTMBEDTLS_CONFIG_FILE=\"mbedtls_proj_config.h\""
 options=$options" CONFIG_OPENTHREAD_FILE=\"openthread-core-cli-config.h\""
 options=$options" CONFIG_OPENTHREAD_CHECK_FILE=\"openthread-core-platform-config-check.h\""

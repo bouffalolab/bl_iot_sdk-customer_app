@@ -32,11 +32,19 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <bl702.h>
 #ifdef CONFIG_BLE_ENABLE
 #include <bl702_glb.h>
 #include <bl702_uart.h>
 #endif
+
+#include <bl_flash.h>
+#include <bl_timer.h>
 #include <bl_wireless.h>
+#include <bl_irq.h>
+#include <lmac154.h>
+#include <lmac154_fpt.h>
+#include <zb_timer.h>
 
 #include <openthread/thread.h>
 #include <openthread/thread_ftd.h>
@@ -101,7 +109,7 @@ void usb_cdc_update_serial_number(uint32_t * pdeviceserial0, uint32_t * pdevices
 
 void otrInitUser(otInstance * instance)
 {
-#ifdef OT_NCP
+#if CONFIG_OT_RCP || CONFIG_OT_NCP
     otAppNcpInit((otInstance * )instance);
 #else
     otAppCliInit((otInstance * )instance);
@@ -135,32 +143,30 @@ static void uart_gpio_init(void)
 }
 #endif
 
+static void lmac154_app_init(void)
+{
+    lmac154_init();
+    lmac154_enableCoex();
+    lmac154_setStd2015Extra(true);
+    lmac154_setTxRetry(0);
+    lmac154_fptClear();
+    lmac154_setEnhAckWaitTime((LMAC154_AIFS + 10 + (6 + 42) * 2) << LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_setRxStateWhenIdle(true);
+
+    lmac154_setTxRxTransTime(0xA0);
+
+    zb_timer_cfg(bl_timer_now_us64() >> LMAC154_US_PER_SYMBOL_BITS);
+    lmac154_disableRx();
+
+    bl_irq_register(M154_IRQn, lmac154_getInterruptCallback());
+    bl_irq_enable(M154_IRQn);
+}
+
 int main(int argc, char *argv[])
 {
-    otRadio_opt_t opt;
+    lmac154_app_init();
 
-    opt.byte = 0;
-
-    opt.bf.isCoexEnable = true;
-#if !(defined CONFIG_BLE_ENABLE) && OPENTHREAD_RADIO
-    opt.bf.isCoexEnable = false;
-#endif
-
-#if OPENTHREAD_FTD
-    opt.bf.isFtd = true;
-#endif
-
-#if OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
-    opt.bf.isLinkMetricEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE
-    opt.bf.isCSLReceiverEnable = true;
-#endif
-#if OPENTHREAD_CONFIG_TIME_SYNC_ENABLE
-    opt.bf.isTimeSyncEnable = true;
-#endif
-
-    otrStart(opt);
+    otrStart();
 
 #ifdef CONFIG_BLE_ENABLE
     uart_gpio_init();

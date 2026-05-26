@@ -9,7 +9,7 @@ PROJECT_BOARD := evb
 export PROJECT_PATH PROJECT_BOARD
 #CONFIG_TOOLPREFIX :=
 
-BLECONTROLLER_LIBS := m1s1 m0s1 m0s1s m0s1p m16s1 m0s0sp m0s1t10 uarthci
+BLECONTROLLER_LIBS := m1s1 m0s1 m0s1s m0s1p m16s1 m0s0sp m0s1t10 uarthci m0s1p_simple
 BLECONTROLLER_LIB_DEFAULT := m1s1
 BLECONTROLLER_LIB_PREFIX := blecontroller_bl702_
 
@@ -75,7 +75,7 @@ endif
 endif
 
 ifeq ($(CONFIG_THREAD), 1)
-INCLUDE_COMPONENTS += thread openthread_port openthread_utils_bl702 openthread_br
+INCLUDE_COMPONENTS += thread openthread_port openthread_br
 INCLUDE_COMPONENTS += mbedtls_lts lwip
 ifeq ($(CONFIG_LITTLEFS), 1)
     INCLUDE_COMPONENTS += littlefs

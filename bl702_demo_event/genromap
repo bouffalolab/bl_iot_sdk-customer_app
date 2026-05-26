@@ -7,7 +7,7 @@ if [ "$3" = "no_thread" ]; then
 else
 	CONFIG_THREAD=1
 	if [ $CONFIG_THREAD -eq "1" ]; then
-	thread_options="CONFIG_THREAD=1 OT_FTD=1 CONFIG_IPV4=1 CONFIG_IPV6=1 CONFIG_OTBR=1"
+	thread_options="CONFIG_THREAD=1 CONFIG_OT_FTD=1 CONFIG_IPV4=1 CONFIG_IPV6=1 CONFIG_OTBR=1"
 	thread_options=$thread_options" CONFIG_EXTMBEDTLS_CONFIG_FILE=\"mbedtls_proj_config.h\""
 	thread_options=$thread_options" CONFIG_OPENTHREAD_FILE=\"openthread-core-br-config.h\""
 	thread_options=$thread_options" CONFIG_OPENTHREAD_CHECK_FILE=\"openthread-core-platform-config-check.h\""

@@ -11,7 +11,3 @@ endif
 ifeq ($(CONFIG_SYS_AOS_CLI_ENABLE),1)
 CPPFLAGS += -DSYS_AOS_CLI_ENABLE
 endif
-
-ifdef OT_NCP
-CPPFLAGS += -DOT_NCP
-endif

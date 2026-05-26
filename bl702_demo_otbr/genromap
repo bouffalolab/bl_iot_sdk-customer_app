@@ -8,17 +8,12 @@
 #   CONFIG_USE_WIFI_BR, for connectivity to infra network interface
 #       1, using Wi-Fi for infra network interface, which needs   
 #       0, disable CDC
-OT_FTD=1
 CONFIG_USE_WIFI_BR=1
 CONFIG_THREAD_AUTO_START=1
 
-CONFIG_PREFIX=otc
 CONFIG_USB_CDC=1
 
-options="CONFIG_USB_CDC=$CONFIG_USB_CDC OT_FTD=$OT_FTD OT_CLI=1 CONFIG_OTBR=1"
-if [[ "$CONFIG_PREFIX" != "" ]]; then
-    options=$options" CONFIG_PREFIX=$CONFIG_PREFIX"
-fi
+options="CONFIG_USB_CDC=$CONFIG_USB_CDC CONFIG_OT_CLI=shell CONFIG_OT_FTD=1 CONFIG_OTBR=1"
 options=$options" CONFIG_THREAD_AUTO_START=$CONFIG_THREAD_AUTO_START" 
 
 if [[ "$CONFIG_USE_WIFI_BR" == "0" ]] || [[ "$CONFIG_USE_WIFI_BR" == "" ]]; then

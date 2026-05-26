@@ -132,16 +132,3 @@ While，directly configuring dataset to attach the device to the network also wo
 6. Ping each other
 
    Type `ipaddr`  to get IP address, and then `ping <ip address>` in command line of another device. And then sniffer tool should captured ICMPv6 packets.
-
-## Sleepy End Device example
-
-Type following command to build:
-
-```shell
-./genotsed
-```
-`genotcli` script has follwoing build options to build FTD/MTD command line device.
-
-| option        | comments                                                     |
-| ------------- | ------------------------------------------------------------ |
-| CONFIG_CSL_RX    | `0`, SED device, CSL receiver disabled<br />`1`, SSED device, CSL recevier enabled. |

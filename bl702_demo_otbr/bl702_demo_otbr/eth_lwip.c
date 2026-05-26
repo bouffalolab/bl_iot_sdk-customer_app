@@ -37,15 +37,20 @@
 #include <lwip/netifapi.h>
 #include <netif/ethernet.h>
 
+#include <openthread/platform/settings.h>
+#include <openthread_port.h>
+#include <openthread_br.h>
+#include <otbr_rtos_lwip.h>
+
 #include "main.h"
 
 extern err_t eth_init(struct netif *netif);
 
 static struct dhcp6 dhcp6_val;
 
-struct netif * otbr_getInfraNetif(void) 
+otbr_lwip_netif_type_t otbr_getInfraNetif(void) 
 {
-    return &eth_mac;
+    return (otbr_lwip_netif_type_t)&eth_mac;
 }
 
 static int app_eth_callback(eth_link_state val)
