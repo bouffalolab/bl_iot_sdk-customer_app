@@ -58,6 +58,8 @@
 
 #include <main.h>
 
+void tcs_credential_pull_init(void);
+
 void vApplicationMallocFailedHook(void)
 {
 #if defined(CFG_USE_PSRAM)
@@ -260,6 +262,7 @@ void otr_start_default(void)
 void otrInitUser(otInstance * instance)
 {
     otAppCliInit((otInstance * )instance);
+    tcs_credential_pull_init();
 
 #ifdef CFG_THREAD_AUTO_START
     otr_start_default();

@@ -65,6 +65,63 @@ Type following command to build:
 
 # Some helpful commands:
   - Command `ifconfig`: to get assigned IP address.
-  - Command `otc state`: to get Thread state. 
-  - Command `otc br state`: to get Border Router state. 
+  - Command `otc state`: to get Thread state.
+  - Command `otc br state`: to get Border Router state.
     - state `running` means border router is running after it attached and IP address is assigned.
+
+# Thread 1.4 Credential Sharing POC
+
+This firmware includes an experimental `tcs_pull` command that mirrors the host-side
+`raw_dataset_pull` commissioner prototype. It uses a one-time credential/ePSKc to
+open a DTLS EC-JPAKE session to another ecosystem's Border Agent, sends
+`MGMT_ACTIVE_GET` to `/c/ag`, prints the returned raw Active Dataset TLVs, and can
+optionally apply those TLVs to this BL702 OTBR.
+
+```shell
+tcs_pull <one_time_code> <border_agent_ip> <border_agent_port> [print|apply|apply-start]
+tcs_scan [timeout_ms]
+```
+
+- `print` is the default and only prints `TCS_ACTIVE_DATASET_TLV=...`.
+- `apply` validates the returned TLVs and calls `otDatasetSetActiveTlvs()`.
+- `apply-start` disables Thread/IP6 first, sets the TLVs, then enables IP6 and Thread.
+- `tcs_scan` uses one total timeout budget to find the first
+  `_meshcop-e._udp.local` Border Agent endpoint. It does not use the one-time
+  credential or pull credentials.
+- `border_agent_ip` must currently be an IPv4/IPv6 literal. IPv6 link-local addresses
+  may use `%<ifindex>`; without a scope, the infra netif index is used.
+- The one-time credential is not printed back to the log. The log only prints
+  `code_len`.
+
+Expected high-level log sequence:
+
+```text
+TCS_PULL_BEGIN ...
+TCS_PULL_STEP socket_connected
+TCS_PULL_STEP dtls_handshake_start
+TCS_PULL_STEP dtls_connected
+TCS_PULL_STEP mgmt_active_get_sent ...
+TCS_PULL_STEP mgmt_active_get_response ...
+TCS_ACTIVE_DATASET_TLV=...
+TCS_PULL_STEP dataset_parse status=OK
+TCS_PULL_END status=ok
+```
+
+Expected scan log sequence:
+
+```text
+TCS_MDNS_SCAN_BEGIN service=_meshcop-e._udp.local ...
+TCS_MDNS_RESULT index=0 instance=... host=... port=... network_name=... xpanid=...
+TCS_MDNS_ENDPOINT index=0 addr_index=0 ip=... port=...
+TCS_MDNS_TXT index=0 item=0 key=... value=... value_hex=...
+TCS_MDNS_SCAN_END status=ok count=... elapsed_ms=...
+```
+
+Known limitations:
+
+- `tcs_scan` only lists discovered Border Agents. `tcs_pull` still takes the selected
+  Border Agent address and port as manual inputs.
+- This is a take-credentials prototype. It does not advertise this OTBR's own
+  Thread credentials to other ecosystems.
+- End-to-end behavior still depends on the remote Border Agent accepting the supplied
+  one-time credential for an EC-JPAKE secure session.

@@ -33,6 +33,7 @@
 #include <bl_timer.h>
 #include <bl_gpio_cli.h>
 #include <bl_wdt_cli.h>
+#include <bl_wdt.h>
 #include <hosal_uart.h>
 #include <hosal_adc.h>
 #include <hal_sys.h>
@@ -54,6 +55,8 @@
 
 #ifdef CFG_NETBUS_WIFI_ENABLE
 #include "netbus_mgmr.h"
+#include "netbus_transceiver.h"
+#include "netbus_wifi_mgmr_cmd_handlers.h"
 #endif
 
 #define mainHELLO_TASK_PRIORITY     ( 20 )
@@ -126,6 +129,21 @@ static void wifi_sta_connect(char *ssid, char *password)
 
     wifi_interface = wifi_mgmr_sta_enable();
     wifi_mgmr_sta_connect(wifi_interface, ssid, password, NULL, NULL, 0, 0);
+}
+
+static volatile bool fSlaveReadyIndSent = false;
+
+void send_ready_ind()
+{
+    netbus_slave_ready_ind_msg_t msg;
+
+    msg.hdr.cmd = BFLB_CMD_SLAVE_READY_IND;
+    msg.hdr.msg_id = BFLB_CMD_SLAVE_READY_IND;
+    msg.args.reserved = 0xFF;
+
+    printf("send slave ready indication\r\n");
+
+    bflbmsg_send(&g_netbus_wifi_mgmr_env.trcver_ctx, BF1B_MSG_TYPE_CMD, &msg, sizeof(msg));
 }
 
 static void event_cb_wifi_event(input_event_t *event, void *private_data)
@@ -287,6 +305,74 @@ static void event_cb_wifi_event(input_event_t *event, void *private_data)
     }
 }
 
+void vApplicationIdleHook(void)
+{
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_feed();
+#endif
+    __asm volatile(
+            "   wfi     "
+    );
+    /*empty*/
+}
+
+void netbus_cmd_confirm_hook(netbus_cmd_confirm_msg_t *cfm)
+{
+    if (cfm)
+    {
+        printf("Get cmd confirm: cmdId=%04x\r\n", cfm->args.cmdId);
+        if (cfm->args.cmdId == BFLB_CMD_SLAVE_READY_IND)
+        {
+            printf("Recv cfm for slave ready indication\r\n");
+            fSlaveReadyIndSent = true;
+        }
+    }
+}
+
+static void send_heartbeat(TimerHandle_t xTimer)
+{
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_feed();
+#endif
+
+    if (!fSlaveReadyIndSent)
+    {
+        send_ready_ind();
+    }
+
+    netbus_slave_heartbeat_msg_t msg;
+    
+    msg.hdr.cmd = BFLB_CMD_SLAVE_HEARTBEAT;
+    msg.hdr.msg_id = BFLB_CMD_SLAVE_HEARTBEAT;
+    msg.args.reserved = 0xFF;
+
+    printf("send heartbeat\r\n");
+
+    bflbmsg_send(&g_netbus_wifi_mgmr_env.trcver_ctx, BF1B_MSG_TYPE_CMD, &msg, sizeof(msg));
+}
+
+TimerHandle_t heartbeatTimerHdl = NULL;
+#define SLAVE_HEARTBEAT_INTVL_IN_SEC 5
+static void app_startHeartbeat()
+{
+    printf("start heartbeat\r\n");
+    
+    if(heartbeatTimerHdl && xTimerIsTimerActive(heartbeatTimerHdl))
+    {
+        return;
+    }
+
+    heartbeatTimerHdl = xTimerCreate("Heartbeat", pdMS_TO_TICKS(SLAVE_HEARTBEAT_INTVL_IN_SEC * 1000), 1, NULL,  send_heartbeat);
+    if (heartbeatTimerHdl)
+    {
+        xTimerStart(heartbeatTimerHdl, 0);
+    }
+    else
+    {
+        printf("Failed to create heatbeat timer\r\n");
+    }
+}
+
 static void _cli_init()
 {
     /*Put CLI which needs to be init here*/
@@ -335,13 +421,17 @@ static void proc_main_entry(void *pvParameters)
 
     aos_register_event_filter(EV_WIFI, event_cb_wifi_event, NULL);
     cmd_stack_wifi(NULL, 0, 0, NULL);
+    send_ready_ind();
+    app_startHeartbeat();
 
     vTaskDelete(NULL);
 }
 
 static void system_thread_init()
 {
-    /*nothing here*/
+#if defined(CFG_WATCHDOG_ENABLE)
+    bl_wdt_init(6000);
+#endif
 }
 
 
@@ -366,6 +456,8 @@ void main()
         app_handle_hbn(NULL, 0);
     }
 #endif
+
+    printf("Reset Info %d\r\n", bl_sys_rstinfo_get());
 
     puts("[OS] Starting proc_mian_entry task...\r\n");
     xTaskCreate(proc_main_entry, (char*)"main_entry", 1024, NULL, 15, NULL);

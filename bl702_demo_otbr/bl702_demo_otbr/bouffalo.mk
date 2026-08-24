@@ -8,6 +8,7 @@ include $(BL60X_SDK_PATH)/components/network/thread/openthread_common.mk
 
 ## This component's src 
 COMPONENT_SRCS := main.c
+COMPONENT_SRCS += tcs_credential_pull.c
 
 ifeq ($(CONFIG_USE_WIFI_BR), 1)
 COMPONENT_SRCS += wifi_lwip.c
